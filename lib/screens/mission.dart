@@ -19,24 +19,30 @@ class MissionPage extends StatelessWidget {
               ),
             ),
             centerTitle: true,
-            bottom: TabBar(
-              dividerColor: Colors.transparent,
-              tabs: [
-                Tab(child: Text('Missions', style: TextStyle(fontWeight: FontWeight.normal))),
-                Tab(child: Text('Redeem', style: TextStyle(fontWeight: FontWeight.normal))),
-                Tab(child: Text('Rewards', style: TextStyle(fontWeight: FontWeight.normal))),
-              ]
-            ),
+            bottom: TabBar(dividerColor: Colors.transparent, tabs: [
+              Tab(
+                  child: Text('Missions',
+                      style: TextStyle(fontWeight: FontWeight.normal))),
+              Tab(
+                  child: Text('Redeem',
+                      style: TextStyle(fontWeight: FontWeight.normal))),
+              Tab(
+                  child: Text('Rewards',
+                      style: TextStyle(fontWeight: FontWeight.normal))),
+            ]),
           ),
           body: TabBarView(
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SingleChildScrollView(scrollDirection: Axis.vertical, child: MissionTab1()),
-                  ],
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SingleChildScrollView(child: MissionTab1()),
+                    ],
+                  ),
                 ),
               ),
             ],
