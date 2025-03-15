@@ -6,18 +6,16 @@ class MissionTab1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildDailyCheckIn(),
-          SizedBox(height: 21),
-          _buildFinancialGoals(),
-          SizedBox(height: 21),
-          _buildSustainableQuests(),
-          SizedBox(height: 21),
-          _buildLeaderboard()
-        ],
-      ),
+    return Column(
+      children: [
+        _buildDailyCheckIn(),
+        SizedBox(height: 21),
+        _buildFinancialGoals(),
+        SizedBox(height: 21),
+        _buildSustainableQuests(),
+        SizedBox(height: 21),
+        _buildLeaderboard()
+      ],
     );
   }
 
@@ -39,7 +37,7 @@ class MissionTab1 extends StatelessWidget {
             children: [
               DashedCircularProgressBar.square(
                 dimensions: 210,
-                progress: (1/7)*100,
+                progress: (1 / 7) * 100,
                 startAngle: 230,
                 sweepAngle: 290,
                 foregroundColor: Colors.green,
@@ -58,8 +56,16 @@ class MissionTab1 extends StatelessWidget {
                   SizedBox(height: 24),
                   Image.asset('assets/images/forest.png', width: 120),
                   SizedBox(height: 8),
-                  Text('150', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: 0)),
-                  Text('points', style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, height: 0)),
+                  Text('150',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          height: 0)),
+                  Text('points',
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                          height: 0)),
                 ],
               )
             ],
@@ -72,7 +78,12 @@ class MissionTab1 extends StatelessWidget {
               backgroundColor: Color(0xFFDCE8D6),
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
             ),
-            child: Text('See you tomorrow!', style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, height: 0)),
+            child: Text('See you tomorrow!',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    height: 0)),
           ),
         ),
       ],
@@ -103,7 +114,8 @@ class MissionTab1 extends StatelessWidget {
           child: Card(
             color: Colors.amber[100],
             child: ListTile(
-              leading: Image.network('https://flagcdn.com/w40/th.png', width: 40),
+              leading:
+                  Image.network('https://flagcdn.com/w40/th.png', width: 40),
               title: Text('Trip to Thailand'),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,7 +162,8 @@ class MissionTab1 extends StatelessWidget {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  LinearProgressIndicator(value: 6 / 7, minHeight: 8, color: Colors.green),
+                  LinearProgressIndicator(
+                      value: 6 / 7, minHeight: 8, color: Colors.green),
                   SizedBox(height: 4),
                   Text('6 / 7 days'),
                 ],
@@ -214,7 +227,8 @@ class MissionTab1 extends StatelessWidget {
           ],
         ),
         SizedBox(height: 4),
-        Text("Get 300 more exp to level up", style: TextStyle(fontSize: 14, color: Colors.grey)),
+        Text("Get 300 more exp to level up",
+            style: TextStyle(fontSize: 14, color: Colors.grey)),
       ],
     );
   }
@@ -234,7 +248,8 @@ class MissionTab1 extends StatelessWidget {
             SizedBox(height: 12),
             TextButton(
               onPressed: () {},
-              child: Text("Show All", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              child: Text("Show All",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -279,11 +294,15 @@ class MissionTab1 extends StatelessWidget {
   Widget _buildTopPlayerProfile() {
     return Column(
       children: [
-        CircleAvatar(radius: 40, backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=3')),
+        CircleAvatar(
+            radius: 40,
+            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=3')),
         SizedBox(height: 8),
-        Text("Jun Wei", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text("Jun Wei",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         Text("Eco King", style: TextStyle(color: Colors.grey)),
-        Text("150000 exp", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text("150000 exp",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -291,10 +310,16 @@ class MissionTab1 extends StatelessWidget {
   Widget _buildLeaderboardList() {
     return Column(
       children: [
-        _buildLeaderboardRow(1, "Jun Wei", "https://i.pravatar.cc/150?img=3", 150000, isTopRank: true),
-        _buildLeaderboardRow(2, "Ci En", "https://i.pravatar.cc/150?img=5", 6210),
-        _buildLeaderboardRow(3, "Joe Ying", "https://i.pravatar.cc/150?img=7", 3400),
-        _buildLeaderboardRow(4, "Sze Kai", "https://i.pravatar.cc/150?img=9", 150, isCurrentUser: true),
+        _buildLeaderboardRow(
+            1, "Jun Wei", "https://i.pravatar.cc/150?img=3", 150000,
+            isTopRank: true),
+        _buildLeaderboardRow(
+            2, "Ci En", "https://i.pravatar.cc/150?img=5", 6210),
+        _buildLeaderboardRow(
+            3, "Joe Ying", "https://i.pravatar.cc/150?img=7", 3400),
+        _buildLeaderboardRow(
+            4, "Sze Kai", "https://i.pravatar.cc/150?img=9", 150,
+            isCurrentUser: true),
       ],
     );
   }
@@ -309,12 +334,14 @@ class MissionTab1 extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Text("$rank", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text("$rank",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           SizedBox(width: 12),
           CircleAvatar(radius: 16, backgroundImage: NetworkImage(avatarUrl)),
           SizedBox(width: 8),
           Expanded(child: Text(name, style: TextStyle(fontSize: 16))),
-          if (isTopRank) Icon(Icons.emoji_events, color: Colors.amber, size: 20),
+          if (isTopRank)
+            Icon(Icons.emoji_events, color: Colors.amber, size: 20),
           SizedBox(width: 8),
           Text("$exp exp", style: TextStyle(fontWeight: FontWeight.bold)),
         ],
