@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:steadypunpipi_vhack/const.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 import 'route.dart';
 
 void main() {
+  Gemini.init(
+    apiKey: GEMINI_API_KEY
+  );
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,6 +25,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -27,27 +36,79 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = AppRoutes.pages;
 
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.attach_money), label: "Transaction"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard), label: "Dashboard"),
-          BottomNavigationBarItem(icon: Icon(Icons.pets), label: "Virtual Pet"),
-          BottomNavigationBarItem(icon: Icon(Icons.flag), label: "Missions"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-        ],
+      floatingActionButton: Container(
+        width: 70.0,
+        height: 70.0,
+        child: FloatingActionButton(
+          onPressed: () {
+            _onTabTapped(2); // Navigate to the PetPage
+          },
+          child: Icon(Icons.pets, size: 30,),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50.0),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: BottomAppBar(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        height: 60,
+        color: Colors.cyan.shade400,
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 10,
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            IconButton(
+              icon: const Icon(
+                Icons.attach_money,
+                color: Colors.black,
+              ),
+              onPressed: () {
+                _onTabTapped(0); // Navigate to the TransactionPage
+              },
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.dashboard,
+                color: Colors.black,
+              ),
+              onPressed: () {
+                _onTabTapped(1); // Navigate to the DashboardPage
+              },
+            ),
+            SizedBox(width: 40), // Space for the FloatingActionButton
+            IconButton(
+              icon: const Icon(
+                Icons.flag,
+                color: Colors.black,
+              ),
+              onPressed: () {
+                _onTabTapped(3); // Navigate to the MissionPage
+              },
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.person,
+                color: Colors.black,
+              ),
+              onPressed: () {
+                _onTabTapped(4); // Navigate to the ProfilePage
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
