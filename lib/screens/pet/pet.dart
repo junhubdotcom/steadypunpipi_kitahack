@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:steadypunpipi_vhack/widgets/circularButton.dart';
+import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/circularButton.dart';
 import 'chatpet.dart';
 
 class PetPage extends StatelessWidget {

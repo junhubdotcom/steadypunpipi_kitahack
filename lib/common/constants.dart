@@ -9,6 +9,7 @@ class AppConstants {
   static const String baseUrl = "https://api.yourserver.com";
   static const String transactionsEndpoint = "$baseUrl/transactions";
   static const String carbonEndpoint = "$baseUrl/carbon";
+  static const String GEMINI_API_KEY = "AIzaSyDUWwvMOPR7sowCBa4MVaN_TMYgrMJqKWs";
 
   // 🎨 Color Palette (Light Theme)
   static const Color primaryColor = Color(0xFF4CAF50);

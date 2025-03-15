@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/common/constants.dart';
-import 'package:steadypunpipi_vhack/widgets/dashboard_settings.dart';
-import 'package:steadypunpipi_vhack/widgets/date_selector.dart';
-import 'package:steadypunpipi_vhack/widgets/breakdown_section.dart';
-import 'package:steadypunpipi_vhack/widgets/tips_section.dart';
-import 'package:steadypunpipi_vhack/widgets/trend_section.dart';
+import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/dashboard_settings.dart';
+import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/date_selector.dart';
+import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/breakdown_section.dart';
+import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/tips_section.dart';
+import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/trend_section.dart';
 
 class DashboardPage extends StatefulWidget {
   @override

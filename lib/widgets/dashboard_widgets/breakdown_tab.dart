@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/common/constants.dart';
 import 'package:steadypunpipi_vhack/models/breakdown_item.dart';
-import 'package:steadypunpipi_vhack/widgets/breakdown_chart.dart';
+import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/breakdown_chart.dart';
 
 Widget buildBreakdownTab({
   required String title,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/models/breakdown_item.dart';
-import 'package:steadypunpipi_vhack/widgets/breakdown_tab.dart';
-import 'package:steadypunpipi_vhack/widgets/expandable_card.dart';
+import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/breakdown_tab.dart';
+import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/expandable_card.dart';
 
 class BreakdownSection extends StatelessWidget {
   const BreakdownSection({super.key});

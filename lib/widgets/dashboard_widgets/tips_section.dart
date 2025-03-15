@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:steadypunpipi_vhack/widgets/expandable_card.dart';
+import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/expandable_card.dart';
 
 class TipsSection extends StatelessWidget {
   const TipsSection({super.key});
