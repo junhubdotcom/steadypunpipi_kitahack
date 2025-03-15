@@ -3,6 +3,8 @@ import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/circularButton.dar
 import 'chatpet.dart';
 
 class PetPage extends StatelessWidget {
+  const PetPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

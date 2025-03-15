@@ -46,17 +46,17 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
-      floatingActionButton: Container(
+      floatingActionButton: SizedBox(
         width: 70.0,
         height: 70.0,
         child: FloatingActionButton(
           onPressed: () {
             _onTabTapped(2); // Navigate to the PetPage
           },
-          child: Icon(Icons.pets, size: 30,),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50.0),
           ),
+          child: Icon(Icons.pets, size: 30,),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

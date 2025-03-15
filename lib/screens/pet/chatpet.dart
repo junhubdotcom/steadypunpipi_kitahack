@@ -7,6 +7,8 @@ import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ChatPet extends StatefulWidget {
+  const ChatPet({super.key});
+
   @override
   State<ChatPet> createState() => _ChatPetState();
 }
