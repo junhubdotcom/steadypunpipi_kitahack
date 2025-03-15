@@ -40,8 +40,10 @@ class _MainScreenState extends State<MainScreen> {
         },
         type: BottomNavigationBarType.fixed,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: "Transaction"),
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Dashboard"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.attach_money), label: "Transaction"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard), label: "Dashboard"),
           BottomNavigationBarItem(icon: Icon(Icons.pets), label: "Virtual Pet"),
           BottomNavigationBarItem(icon: Icon(Icons.flag), label: "Missions"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
