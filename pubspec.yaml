@@ -12,6 +12,10 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+  month_picker_dialog: ^6.0.3
+  intl: ^0.20.2
+  flutter_speed_dial: ^7.0.0
   dashed_circular_progress_bar: ^0.0.6
   flutter_floating_bottom_bar: ^1.2.0
   dash_chat_2: ^0.0.21
