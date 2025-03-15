@@ -99,7 +99,7 @@ class _TransactionPageState extends State<TransactionPage> {
           'Transaction',
           style: GoogleFonts.quicksand(
             fontWeight: FontWeight.bold,
-            fontSize: 26,
+            fontSize: 24,
           ),
         ),
         centerTitle: true,
@@ -177,10 +177,11 @@ class _TransactionPageState extends State<TransactionPage> {
                       borderRadius: BorderRadius.all(Radius.circular(8.0)))),
             ),
             SizedBox(
-              height: 10,
+              height: 15,
             ),
             SearchBar(
                 leading: Icon(Icons.search),
+                hintText: 'Search',
                 constraints: BoxConstraints(minHeight: 45, maxHeight: 45),
                 elevation: WidgetStatePropertyAll(0),
                 shape: WidgetStatePropertyAll(RoundedRectangleBorder(
