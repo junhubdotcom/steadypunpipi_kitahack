@@ -163,7 +163,7 @@ class _DateSelectorState extends State<DateSelector> {
             0: Text(
               'Daily',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppConstants.fontSizeMedium,
                 fontWeight: FontWeight.bold,
                 color: _selectedIndex == 0
                     ? AppConstants.infoColor
@@ -173,7 +173,7 @@ class _DateSelectorState extends State<DateSelector> {
             1: Text(
               'Weekly',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppConstants.fontSizeMedium,
                 fontWeight: FontWeight.bold,
                 color: _selectedIndex == 1
                     ? AppConstants.infoColor
@@ -183,7 +183,7 @@ class _DateSelectorState extends State<DateSelector> {
             2: Text(
               'Monthly',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppConstants.fontSizeMedium,
                 fontWeight: FontWeight.bold,
                 color: _selectedIndex == 2
                     ? AppConstants.infoColor

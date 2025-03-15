@@ -28,7 +28,7 @@ class BreakdownSection extends StatelessWidget {
 
 Widget expenseTab() {
   return buildBreakdownTab(
-    title: "Expenses",
+    title: "Expense",
     data: fetchExpenses(),
     unit: "RM",
     valueColor: Colors.red, 

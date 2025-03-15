@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:steadypunpipi_vhack/models/finance_data.dart';
 import 'package:steadypunpipi_vhack/widgets/expandable_card.dart';
+import 'package:steadypunpipi_vhack/widgets/expenseco2_chart.dart';
+import 'package:steadypunpipi_vhack/widgets/finance_bar_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class TrendSection extends StatelessWidget {
   const TrendSection({super.key});
@@ -15,9 +19,29 @@ class TrendSection extends StatelessWidget {
         Tab(text: "Expense & CO₂"),
       ],
       tabViews: [
-        const Placeholder(child: Text("Grouped Bar Chart")),
-        const Placeholder(child: Text("Dual-Axis Line Chart/Bar-Line Chart")),
+        FinanceBarChart(data: mockData, title: "Day"),
+        ExpenseCO2Chart(data: mockData, title: "Day")
       ],
     );
   }
 }
+
+
+
+// Widget expenseTab() {
+//   return buildBreakdownTab(
+//     title: "Expense",
+//     data: fetchExpenses(),
+//     unit: "RM",
+//     valueColor: Colors.red, 
+//   );
+// }
+
+// Widget incomeTab() {
+//   return buildBreakdownTab(
+//     title: "Income",
+//     data: fetchIncome(),
+//     unit: "RM",
+//     valueColor: Colors.green, 
+//   );
+// }

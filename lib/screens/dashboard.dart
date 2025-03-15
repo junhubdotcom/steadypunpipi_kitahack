@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/common/constants.dart';
+import 'package:steadypunpipi_vhack/widgets/dashboard_settings.dart';
 import 'package:steadypunpipi_vhack/widgets/date_selector.dart';
 import 'package:steadypunpipi_vhack/widgets/breakdown_section.dart';
+import 'package:steadypunpipi_vhack/widgets/tips_section.dart';
 import 'package:steadypunpipi_vhack/widgets/trend_section.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -12,13 +14,21 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   int _selectedIndex = 1; // Default to "Weekly"
 
+  List<String> sectionOrder = ["Summary", "Breakdown", "Trend", "Tips"];
+  Map<String, bool> sectionVisibility = {
+    "Summary": true,
+    "Breakdown": true,
+    "Trend": true,
+    "Tips": true,
+  };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {},
           icon: Icon(Icons.settings),
+          onPressed: _openSettingsModal,
         ),
         title: Text("Dashboard"),
         centerTitle: true,
@@ -42,30 +52,63 @@ class _DashboardPageState extends State<DashboardPage> {
                 });
               },
             ),
-            SizedBox(height: AppConstants.paddingMedium),
-            _buildSummary(),
-            SizedBox(height: AppConstants.paddingMedium),
-            _buildCard("Quick Statistics",
-                "BLABLABLABLA\nasdhahkldsjaisdjkljsd\nashdajskdsdhasdjkah"),
-            SizedBox(height: AppConstants.paddingMedium),
-            BreakdownSection(),
-            SizedBox(height: AppConstants.paddingMedium),
-            TrendSection(),
-            SizedBox(height: AppConstants.paddingMedium),
-            _buildTipsSection(),
+            for (String section in sectionOrder) ...[
+              if (sectionVisibility[section] == true) _buildSection(section),
+              SizedBox(height: AppConstants.paddingMedium),
+            ],
           ],
         ),
       ),
     );
   }
 
+  Widget _buildSection(String section) {
+    switch (section) {
+      case "Summary":
+        return _buildSummary();
+      case "Breakdown":
+        return BreakdownSection();
+      case "Trend":
+        return TrendSection();
+      case "Tips":
+        return TipsSection();
+      default:
+        return SizedBox.shrink();
+    }
+  }
+
+  void _openSettingsModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return DashboardSettingsModal(
+          initialSections: sectionOrder,
+          onSave: (newOrder, newVisibility) {
+            setState(() {
+              sectionOrder = newOrder;
+              sectionVisibility = newVisibility;
+            });
+          },
+        );
+      },
+    );
+  }
+
   Widget _buildSummary() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Column(
       children: [
-        _buildCircularSummary("CO₂", "148kg"),
-        _buildCircularSummary("Balance", "RM100"),
-        _buildCircularSummary("Income", "RM100"),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildCircularSummary("CO₂", "148kg"),
+            _buildCircularSummary("Balance", "RM100"),
+            _buildCircularSummary("Income", "RM100"),
+          ],
+        ),
+        SizedBox(height: AppConstants.paddingMedium),
+        _buildCard("Quick Statistics",
+            "BLABLABLABLA\nasdhahkldsjaisdjkljsd\nashdajskdsdhasdjkah"),
       ],
     );
   }
@@ -128,37 +171,6 @@ class _DashboardPageState extends State<DashboardPage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTipsSection() {
-    return _buildExpandableCard("Tips", "Your action can make better life");
-  }
-
-  Widget _buildExpandableCard(String title, String subtitle) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ExpansionTile(
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(AppConstants.paddingMedium),
-            child:
-                const Placeholder(child: Text("Many Many Tips and Insights")),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(AppConstants.paddingMedium),
-            child:
-                const Placeholder(child: Text("Many Many Tips and Insights")),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(AppConstants.paddingMedium),
-            child:
-                const Placeholder(child: Text("Many Many Tips and Insights")),
-          ),
-        ],
       ),
     );
   }
