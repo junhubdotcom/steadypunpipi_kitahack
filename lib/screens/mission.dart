@@ -35,7 +35,7 @@ class MissionPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    MissionTab1(),
+                    SingleChildScrollView(scrollDirection: Axis.vertical, child: MissionTab1()),
                   ],
                 ),
               ),

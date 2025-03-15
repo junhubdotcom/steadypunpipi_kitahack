@@ -6,18 +6,16 @@ class MissionTab1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
+    return Column(
+      children: [
           _buildDailyCheckIn(),
           SizedBox(height: 21),
           _buildFinancialGoals(),
           SizedBox(height: 21),
           _buildSustainableQuests(),
           SizedBox(height: 21),
-          _buildLeaderboard()
-        ],
-      ),
+        _buildLeaderboard()
+      ],
     );
   }
 
@@ -174,7 +172,6 @@ class MissionTab1 extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTitle(),
-        SizedBox(height: 12),
         _buildProgressBar(),
         SizedBox(height: 16),
         _buildLeaderboardCard(),
@@ -189,6 +186,7 @@ class MissionTab1 extends StatelessWidget {
         fontSize: 28,
         fontWeight: FontWeight.bold,
         fontStyle: FontStyle.italic,
+        height: 0
       ),
     );
   }
@@ -199,22 +197,28 @@ class MissionTab1 extends StatelessWidget {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
-              child: LinearProgressIndicator(
-                value: 150 / 450,
-                minHeight: 8,
-                backgroundColor: Colors.grey[300],
-                color: Colors.amber,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text("150 exp", style: TextStyle(fontWeight: FontWeight.bold)),
+                  LinearProgressIndicator(
+                    value: 150 / 450,
+                    minHeight: 8,
+                    backgroundColor: Colors.grey[300],
+                    color: Colors.amber,
+                  ),
+                ],
               ),
             ),
             SizedBox(width: 8),
-            Text("150 exp", style: TextStyle(fontWeight: FontWeight.bold)),
-            Icon(Icons.info_outline, size: 20),
+            Icon(Icons.stars_rounded, size: 24),
           ],
         ),
         SizedBox(height: 4),
-        Text("Get 300 more exp to level up", style: TextStyle(fontSize: 14, color: Colors.grey)),
+        Text("Get 300 more exp to level up", style: TextStyle(fontSize: 12, color: Colors.black)),
       ],
     );
   }
