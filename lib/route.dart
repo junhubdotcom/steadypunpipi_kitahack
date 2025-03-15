@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/dashboard.dart';
-import 'screens/mission.dart';
+import 'screens/mission/mission.dart';
 import 'screens/profile.dart';
 import 'screens/transaction.dart';
 import 'screens/pet/pet.dart';
