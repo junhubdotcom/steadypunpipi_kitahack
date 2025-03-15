@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:steadypunpipi_vhack/components/mission_tab1.dart';
+import 'package:steadypunpipi_vhack/screens/mission/mission_tab1.dart';
 
 class MissionPage extends StatelessWidget {
   const MissionPage({super.key});
