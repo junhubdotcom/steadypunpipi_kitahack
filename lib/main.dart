@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:steadypunpipi_vhack/const.dart';
+import 'package:steadypunpipi_vhack/common/constants.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'route.dart';
 
 void main() {
   Gemini.init(
-    apiKey: GEMINI_API_KEY
+    apiKey: AppConstants.GEMINI_API_KEY
   );
   runApp(MyApp());
 }

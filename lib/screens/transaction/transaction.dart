@@ -3,8 +3,8 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:steadypunpipi_vhack/widgets/indicator.dart';
-import 'package:steadypunpipi_vhack/widgets/transaction_list.dart';
+import 'package:steadypunpipi_vhack/widgets/transaction_widgets/indicator.dart';
+import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_list.dart';
 
 class TransactionPage extends StatefulWidget {
   @override
