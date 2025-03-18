@@ -263,9 +263,9 @@ class _MissionTab1State extends State<MissionTab1> {
                 _toggleValue = value;
               });
             },
-            buttonColor: const Color(0xFF0A3157),
-            backgroundColor: const Color(0xFFB5C1CC),
-            textColor: const Color(0xFFFFFFFF),
+            buttonColor: const Color(0xFFFFC044),
+            backgroundColor: const Color(0xFFFFF4DF),
+            textColor: const Color(0xFF000000),
           ),
           SizedBox(height: 12),
           Center(child: _buildTopPlayerProfile()),
@@ -299,7 +299,7 @@ class _MissionTab1State extends State<MissionTab1> {
         SizedBox(height: 8),
         Text("Jun Wei",
             style: GoogleFonts.quicksand(fontSize: 18, fontWeight: FontWeight.bold)),
-        Text("Eco King", style: GoogleFonts.quicksand(color: Colors.grey)),
+        Text("Eco King", style: GoogleFonts.quicksand(color: Colors.black)),
         Text("150000 exp",
             style: GoogleFonts.quicksand(fontSize: 16, fontWeight: FontWeight.bold)),
       ],
@@ -338,7 +338,7 @@ class _MissionTab1State extends State<MissionTab1> {
           SizedBox(width: 12),
           CircleAvatar(radius: 16, backgroundImage: NetworkImage(avatarUrl)),
           SizedBox(width: 15),
-          Expanded(child: Text(name, style: GoogleFonts.quicksand(fontSize: 15))),
+          Expanded(child: Text(name, style: GoogleFonts.quicksand(fontSize: 15, fontWeight: FontWeight.bold))),
           if (isTopRank)
             Icon(Icons.emoji_events, color: Colors.amber, size: 20),
           SizedBox(width: 8),

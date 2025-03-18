@@ -8,7 +8,7 @@ class AnimatedToggle extends StatefulWidget {
   final Color buttonColor;
   final Color textColor;
 
-  AnimatedToggle({
+  const AnimatedToggle({super.key, 
     required this.values,
     required this.onToggleCallback,
     this.backgroundColor = const Color(0xFFe7e7e8),
@@ -59,7 +59,7 @@ class _AnimatedToggleState extends State<AnimatedToggle> {
                       widget.values[index],
                       style: GoogleFonts.quicksand(
                         fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.normal,
                       ),
                     ),
                   ),

@@ -132,38 +132,53 @@ class _MissionTab2State extends State<MissionTab2> {
             color: reward.backgroundColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 16.0),
               child: Row(
                 children: [
                   SizedBox(width: 18),
                   CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.white,
-                    child: reward.image,
+                  radius: 30,
+                  backgroundColor: Colors.white,
+                  child: reward.image,
                   ),
                   SizedBox(width: 15),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          reward.title,
-                          style: GoogleFonts.quicksand(fontSize: 15, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          reward.subtitle, 
-                          style: GoogleFonts.quicksand(fontSize: 12, fontWeight: FontWeight.normal)),
-                        SizedBox(height: 6),
-                        Text(
-                          reward.points,
-                          style: GoogleFonts.quicksand(fontSize: 15, fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                    Text(
+                      reward.title,
+                      style: GoogleFonts.quicksand(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
+                    Text(
+                      reward.subtitle, 
+                      style: GoogleFonts.quicksand(fontSize: 12, fontWeight: FontWeight.normal)),
+                    SizedBox(height: 6),
+                    Text(
+                      reward.points,
+                      style: GoogleFonts.quicksand(fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                    ],
                   ),
-                  CircleAvatar(
-                    backgroundColor: Colors.grey[200],
-                    child: Icon(Icons.add, size: 24),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      // Handle tap event
+                    },
+                    child: Container(
+                      width: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(83),
+                        topRight: Radius.circular(15),
+                        bottomLeft: Radius.circular(82),
+                        bottomRight: Radius.circular(15),
+                        ),
+                      ),
+                      padding: EdgeInsets.all(8),
+                      child: Icon(Icons.add, size: 24),
+                    ),
                   ),
                 ],
               ),

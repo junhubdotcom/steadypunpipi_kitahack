@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/screens/mission/mission_tab1.dart';
 import 'package:steadypunpipi_vhack/screens/mission/mission_tab2.dart';
+import 'package:steadypunpipi_vhack/screens/mission/mission_tab3.dart';
 
 class MissionPage extends StatelessWidget {
   const MissionPage({super.key});
@@ -46,7 +47,8 @@ class MissionPage extends StatelessWidget {
                   ),
                 ),
               ),
-              MissionTab2()
+              MissionTab2(),
+              MissionTab3(),
             ],
           ),
         ),
