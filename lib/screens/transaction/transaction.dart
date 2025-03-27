@@ -3,6 +3,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:steadypunpipi_vhack/screens/transaction/record_transaction.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/indicator.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_list.dart';
 
@@ -79,7 +80,10 @@ class _TransactionPageState extends State<TransactionPage> {
               Icons.edit,
               color: Colors.black,
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => RecordTransaction()));
+            },
             shape: CircleBorder(),
             backgroundColor: Color(0xff92b977),
           ),
