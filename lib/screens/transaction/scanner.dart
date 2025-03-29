@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:steadypunpipi_vhack/screens/transaction/receipt_photo.dart';
 
 class Scanner extends StatefulWidget {
   @override
@@ -54,12 +55,12 @@ class _ScannerState extends State<Scanner> {
       imgPath = image.path;
     });
 
-    // Navigator.push(
-    //     context,
-    //     MaterialPageRoute(
-    //         builder: (context) => Photo(
-    //               imgPath: imgPath!,
-    //             )));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ReceiptPhoto(
+                  imgPath: imgPath!,
+                )));
   }
 
   Future<void> _onCapturePressed(context) async {
@@ -76,12 +77,12 @@ class _ScannerState extends State<Scanner> {
       print("Capture error: $e");
     }
 
-    // Navigator.push(
-    //     context,
-    //     MaterialPageRoute(
-    //         builder: (context) => Photo(
-    //               imgPath: imgPath!,
-    //             )));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ReceiptPhoto(
+                  imgPath: imgPath!,
+                )));
   }
 
   Widget _cameraPreviewWidget() {
