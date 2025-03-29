@@ -5,11 +5,13 @@ class DetailsButton extends StatelessWidget {
   int textColor;
   int buttonColor;
   VoidCallback onPressed;
+  String button_text;
 
   DetailsButton(
       {required this.textColor,
       required this.buttonColor,
       required this.onPressed,
+      required this.button_text,
       super.key});
 
   @override
@@ -22,7 +24,7 @@ class DetailsButton extends StatelessWidget {
           backgroundColor: Color(buttonColor),
         ),
         child: Text(
-          'Delete',
+          button_text,
           style: GoogleFonts.quicksand(
               color: Color(textColor),
               fontWeight: FontWeight.w900,

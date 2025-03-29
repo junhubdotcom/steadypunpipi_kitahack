@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/record_transaction.dart';
+import 'package:steadypunpipi_vhack/screens/transaction/scanner.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/indicator.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_list.dart';
 
@@ -92,7 +93,10 @@ class _TransactionPageState extends State<TransactionPage> {
               Icons.document_scanner_rounded,
               color: Colors.black,
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Scanner()));
+            },
             shape: CircleBorder(),
             backgroundColor: Color(0xff92b977),
           ),
@@ -128,24 +132,29 @@ class _TransactionPageState extends State<TransactionPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Indicator(title: 'Income', value: 'RM 1000.00'),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Indicator(title: 'Expenses', value: 'RM 900.00'),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Indicator(title: 'Carbon Footprint', value: '500 CO2e'),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Indicator(title: 'Income', value: 'RM 1000.00'),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Indicator(title: 'Expenses', value: 'RM 900.00'),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Indicator(title: 'Carbon Footprint', value: '500 CO2e'),
+                    ],
+                  ),
                 ),
-                Image.asset(
-                  'assets/images/green_tree.png',
-                  width: MediaQuery.sizeOf(context).width * 0.50,
-                  height: MediaQuery.sizeOf(context).height * 0.20,
+                Expanded(
+                  child: Image.asset(
+                    'assets/images/green_tree.png',
+                    // fit: BoxFit.cover,
+                    width: MediaQuery.sizeOf(context).width * 0.50,
+                    height: MediaQuery.sizeOf(context).height * 0.20,
+                  ),
                 )
               ],
             ),
@@ -168,9 +177,11 @@ class _TransactionPageState extends State<TransactionPage> {
                           fontWeight: FontWeight.w600,
                           color: Colors.black),
                     ),
-                    Icon(
-                      Icons.arrow_drop_down,
-                      size: 20,
+                    Expanded(
+                      child: Icon(
+                        Icons.arrow_drop_down,
+                        size: 20,
+                      ),
                     )
                   ],
                 ),

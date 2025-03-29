@@ -33,7 +33,7 @@ class TransactionDetails extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(vertical: 20, horizontal: 26),
                 decoration: BoxDecoration(
-                    color: Color(0XFFC8E9BE),
+                    color: Color(0XFFE6E6E6),
                     borderRadius: BorderRadius.circular(15)),
                 child: Column(
                   children: [
@@ -98,12 +98,14 @@ class TransactionDetails extends StatelessWidget {
                   DetailsButton(
                       textColor: 0xffe6e6e6,
                       buttonColor: 0xff999999,
+                      button_text: "Delete",
                       onPressed: () {
                         Navigator.pop(context);
                       }),
                   DetailsButton(
                       textColor: 0xff000000,
                       buttonColor: 0xff999974c95c,
+                      button_text: "Edit",
                       onPressed: () {
                         Navigator.pop(context);
                       })
