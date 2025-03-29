@@ -60,12 +60,12 @@ class _ReceiptPhotoState extends State<ReceiptPhoto> {
                       onPressed: () async {
                         Transaction transaction =
                             await _apiService.generateContent(widget.imgPath);
-                       
+
                         Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => RecordTransaction(
-                                      
+                                      transaction: transaction,
                                     )));
                       },
                     ),

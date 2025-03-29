@@ -28,7 +28,7 @@ class Transaction {
         receiptImagePath = receiptImagePath ?? "",
         additionalImagePath = additionalImagePath ?? [""];
 
-        // From JSON
+  // From JSON
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
       transactionName: json['transactionName'] ?? "",
@@ -38,9 +38,9 @@ class Transaction {
           .map((item) => TransactionItem.fromJson(item))
           .toList(),
       // You can handle the following fields if Gemini returns them later or set defaults
-      dateTime: DateTime.now(),
-      location: "",
-      receiptImagePath: "",
+      dateTime: DateTime.tryParse(json['dateTime'] ?? "") ?? DateTime.now(),
+      location: json['location'] ?? "",
+      receiptImagePath: json['receiptImagePath'] ?? "",
       additionalImagePath: [""],
     );
   }
@@ -58,7 +58,4 @@ class Transaction {
       'additionalImagePath': additionalImagePath,
     };
   }
-
 }
-
-

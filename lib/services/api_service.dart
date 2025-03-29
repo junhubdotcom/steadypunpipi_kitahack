@@ -36,14 +36,17 @@ Use the following JSON schema:
   "transactionName": String, // If there are multiple items, generate a smart name like "McDonald's Lunch" or "Grocery Shopping"; if only one item, set this to "none"
   "isMultipleItem": Boolean, // true if more than 1 item
   "paymentMethod": String, // choose one from: "Cash", "E-Wallet", "Online Banking"
+  "location": String, // Extract location from receipt if available (e.g. merchant address or shop name)
+  "dateTime": DateTime, // Extracted from the receipt if available
   "items": [
     {
       "name": String, // name of the item purchased
-      "category": String, // choose from: "Food", "Housing", "Debt Repayment", "Medical", "Transport", "Utilities", "Shopping"
+      "category": String, // choose from: "Food", "Housing", "Debt Repayment", "Medical", "Transport", "Utilities", "Shopping", "Tax"
       "quantity": String, // quantity of this item
       "price": Double, // price per unit
     }
-  ]
+  ],
+  "receiptImagePath": $imgPath,
 }
 
 Instructions:

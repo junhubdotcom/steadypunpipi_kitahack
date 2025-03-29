@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:steadypunpipi_vhack/models/transaction.dart';
 import 'package:steadypunpipi_vhack/models/transaction_item.dart';
+import 'package:steadypunpipi_vhack/screens/transaction/scanner.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/Itembutton.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/details_button.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/image_upload.dart';
@@ -28,7 +29,7 @@ class RecordTransaction extends StatefulWidget {
 class _RecordTransactionState extends State<RecordTransaction> {
   String? receipt;
   String? thing_image;
-  bool _isMultiple = false;
+
   String category_dropdown_value = "Food";
 
   // List<String?> uploadedImages = List.generate(2, (_) => null);
@@ -59,6 +60,41 @@ class _RecordTransactionState extends State<RecordTransaction> {
       print("Failed to pick image: $e");
     }
   }
+
+  Future pickDateTime() async {
+    DateTime? date = await pickDate();
+    if (date == null) return;
+    setState(() {
+      widget.transaction.dateTime = date;
+    });
+    TimeOfDay? time = await pickTime();
+    if (time == null) return;
+
+    final newDateTime = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+    setState(() {
+      widget.transaction.dateTime = newDateTime;
+    });
+  }
+
+  Future<DateTime?> pickDate() => showDatePicker(
+        context: context,
+        initialDate: widget.transaction.dateTime,
+        firstDate: DateTime(1900),
+        lastDate: DateTime(2100),
+      );
+
+  Future<TimeOfDay?> pickTime() => showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(
+        hour: widget.transaction.dateTime.hour,
+        minute: widget.transaction.dateTime.minute,
+      ));
 
   @override
   void initState() {
@@ -95,11 +131,11 @@ class _RecordTransactionState extends State<RecordTransaction> {
                       // contentPadding: EdgeInsets.all(0),
                       // materialTapTargetSize:
                       //     MaterialTapTargetSize.shrinkWrap, // shrink tap area
-                      value: _isMultiple,
+                      value: widget.transaction.isMultipleItem,
                       visualDensity: VisualDensity.compact,
                       onChanged: (bool? newValue) {
                         setState(() {
-                          _isMultiple = newValue ?? false;
+                          widget.transaction.isMultipleItem = newValue ?? false;
                         });
                       }),
                   Text('Multiple Item',
@@ -108,11 +144,15 @@ class _RecordTransactionState extends State<RecordTransaction> {
                               fontSize: 16, fontWeight: FontWeight.w600))),
                 ],
               ),
-              _isMultiple
+              widget.transaction.isMultipleItem
                   ? Column(
                       children: [
                         SmallTitle(title: "Transaction Name"),
-                        TransactionTextfield(onChanged: (value) {}),
+                        TransactionTextfield(
+                            value: widget.transaction.transactionName,
+                            onChanged: (value) {
+                              widget.transaction.transactionName = value!;
+                            }),
                         SmallTitle(title: "Item"),
                         ItemHeader(),
                         ...widget.transaction.items
@@ -122,14 +162,15 @@ class _RecordTransactionState extends State<RecordTransaction> {
                           // int index = entry.key;
                           TransactionItem item = entry.value;
                           return ItemList(
-                              item: item,
-                              onNameChanged: (value) => item.name = value!,
-                              onPriceChanged: (value) =>
-                                  item.price = value! as double,
-                              onQuantityChanged: (value) =>
-                                  item.quantity = value!,
-                              onCategoryChanged: (value) =>
-                                  item.category = value!);
+                            item: item,
+                            onNameChanged: (value) => item.name = value!,
+                            onCategoryChanged: (value) =>
+                                item.category = value!,
+                            onQuantityChanged: (value) =>
+                                item.quantity = value! as int,
+                            onPriceChanged: (value) =>
+                                item.price = value! as double,
+                          );
                         }),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -167,15 +208,16 @@ class _RecordTransactionState extends State<RecordTransaction> {
                           onNameChanged: (value) {
                             widget.transaction.items.first.name = value!;
                           },
+                          onCategoryChanged: (value) {
+                            widget.transaction.items.first.category = value!;
+                          },
                           onPriceChanged: (value) {
                             widget.transaction.items.first.price =
                                 value! as double;
                           },
                           onQuantityChanged: (value) {
-                            widget.transaction.items.first.quantity = value!;
-                          },
-                          onCategoryChanged: (value) {
-                            widget.transaction.items.first.category = value!;
+                            widget.transaction.items.first.quantity =
+                                value! as int;
                           },
                         )
                       ],
@@ -196,20 +238,26 @@ class _RecordTransactionState extends State<RecordTransaction> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       elevation: 0,
+                      padding: EdgeInsets.only(left: 10, right: 20),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5)),
                       shadowColor: Colors.transparent, // No shadow color
                       backgroundColor: Color(0xffe6e6e6)),
-                  onPressed: () {},
+                  onPressed: () {
+                    pickDateTime();
+                  },
                   child: Text(
                       DateFormat('dd MMMM yyyy HH:mm')
                           .format(widget.transaction.dateTime),
                       style: TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.w400)),
+                          color: Colors.black,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16)),
                 ),
               ),
               SmallTitle(title: 'Location'),
               TransactionTextfield(
+                  value: widget.transaction.location,
                   onChanged: (value) => widget.transaction.location),
               SmallTitle(title: 'Receipt'),
               ImageUpload(
@@ -234,10 +282,15 @@ class _RecordTransactionState extends State<RecordTransaction> {
                   ListTile(
                     leading: Icon(Icons.document_scanner_sharp),
                     title: Text('Scan Receipt'),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(context,
+                          (MaterialPageRoute(builder: (context) => Scanner())));
+                    },
                   ),
                 ],
-                imgPath: receipt,
+                imgPath: widget.transaction.receiptImagePath != ""
+                    ? widget.transaction.receiptImagePath
+                    : receipt,
               ),
               //Image
               SmallTitle(title: 'Image'),

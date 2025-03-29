@@ -47,7 +47,8 @@ class _ItemListState extends State<ItemList> {
                   "Medical",
                   "Transport",
                   "Utilities",
-                  "Shopping"
+                  "Shopping",
+                  "Tax"
                 ]),
           ),
           SizedBox(width: 5),
@@ -55,14 +56,14 @@ class _ItemListState extends State<ItemList> {
               flex: 1,
               child: TransactionTextfield(
                 onChanged: widget.onQuantityChanged,
-                value: widget.item.quantity,
+                value: widget.item.quantity.toString(),
               )),
           SizedBox(width: 5),
           Expanded(
               flex: 2,
               child: TransactionTextfield(
-                onChanged: widget.onQuantityChanged,
-                value: widget.item.quantity,
+                onChanged: widget.onPriceChanged,
+                value: widget.item.price.toString(),
               )),
         ],
       ),
