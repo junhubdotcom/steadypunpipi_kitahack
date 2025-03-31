@@ -24,9 +24,30 @@ class _PetPageState extends State<PetPage> {
                 child: Stack(
                   children: [
                     Positioned.fill(
-                      child: Image.asset(
-                        'assets/images/temppet.png', // Ensure this path is correct
-                        fit: BoxFit.cover,
+                      child: Stack(
+                        children: [
+                          // Background image (most bottom)
+                          Positioned.fill(
+                            child: Image.asset(
+                              'assets/images/backgrounds/background1.png', // Replace with your background image path
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          // Floor image (middle layer)
+                          Positioned.fill(
+                            child: Image.asset(
+                              'assets/images/backgrounds/floor1.png', // Replace with your floor image path
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          // Foreground image (top layer)
+                          Positioned.fill(
+                            child: Image.asset(
+                              'assets/images/cats/cat1.png', // Replace with your top image path
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Positioned(

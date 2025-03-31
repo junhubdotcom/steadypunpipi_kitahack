@@ -12,33 +12,123 @@ class _WardrobePetState extends State<WardrobePet>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final List<Map<String, dynamic>> backgroundItems = [
+  final List<Map<String, dynamic>> backgroundItems1 = [
     {
-      'imageUrl': "assets/images/temppet.png",
+      'imageUrl': "assets/images/backgrounds/background1.png",
       'isUnlock': true,
     },
     {
-      'imageUrl': "assets/images/temppet.png",
+      'imageUrl': "assets/images/backgrounds/background2.png",
       'isUnlock': false,
     },
     {
-      'imageUrl': "assets/images/temppet.png",
+      'imageUrl': "assets/images/backgrounds/background3.png",
+      'isUnlock': false,
+    },
+  ];
+
+  final List<Map<String, dynamic>> backgroundItems2 = [
+    {
+      'imageUrl': "assets/images/backgrounds/background1.png",
+      'isUnlock': true,
+    },
+    {
+      'imageUrl': "assets/images/backgrounds/background2.png",
+      'isUnlock': false,
+    },
+    {
+      'imageUrl': "assets/images/backgrounds/background3.png",
+      'isUnlock': false,
+    },
+  ];
+
+  final List<Map<String, dynamic>> shirtItems1 = [
+    {
+      'imageUrl': "assets/images/shirts/shirt1.png",
+      'isUnlock': true,
+    },
+    {
+      'imageUrl': "assets/images/shirts/shirt2.png",
+      'isUnlock': false,
+    },
+    {
+      'imageUrl': "assets/images/shirts/shirt3.png",
       'isUnlock': true,
     },
   ];
 
-  final List<Map<String, dynamic>> shirtItems = [
+  final List<Map<String, dynamic>> shirtItems2 = [
     {
-      'imageUrl': "assets/images/shirts/9.png",
+      'imageUrl': "assets/images/shirts/shirt4.png",
       'isUnlock': true,
     },
     {
-      'imageUrl': "assets/images/shirts/7.png",
+      'imageUrl': "assets/images/shirts/shirt5.png",
       'isUnlock': false,
     },
     {
-      'imageUrl': "assets/images/shirts/8.png",
+      'imageUrl': "assets/images/shirts/shirt3.png",
       'isUnlock': true,
+    },
+  ];
+
+  final List<Map<String, dynamic>> hatItems1 = [
+    {
+      'imageUrl': "assets/images/hats/hat1.png",
+      'isUnlock': true,
+    },
+    {
+      'imageUrl': "assets/images/hats/hat2.png",
+      'isUnlock': false,
+    },
+    {
+      'imageUrl': "assets/images/hats/hat3.png",
+      'isUnlock': false,
+    },
+  ];
+
+  final List<Map<String, dynamic>> hatItems2 = [
+    {
+      'imageUrl': "assets/images/hats/hat3.png",
+      'isUnlock': true,
+    },
+    {
+      'imageUrl': "assets/images/hats/hat4.png",
+      'isUnlock': false,
+    },
+    {
+      'imageUrl': "assets/images/hats/hat5.png",
+      'isUnlock': false,
+    },
+  ];
+
+  final List<Map<String, dynamic>> catItems1 = [
+    {
+      'imageUrl': "assets/images/cats/cat1.png",
+      'isUnlock': true,
+    },
+    {
+      'imageUrl': "assets/images/cats/cat2.png",
+      'isUnlock': false,
+    },
+    {
+      'imageUrl': "assets/images/cats/cat3.png",
+      'isUnlock': false,
+    },
+  ];
+
+  final List<Map<String, dynamic>> catItems2 = [
+    {
+      'imageUrl': "assets/images/cats/cat3.png",
+      'isUnlock': false,
+    },
+    {
+      'imageUrl': "assets/images/cats/cat4.png",
+      'isUnlock': true,
+    },
+    {
+      'imageUrl': "assets/images/cats/cat5.png",
+      'isUnlock': false,
     },
   ];
 
@@ -70,10 +160,30 @@ class _WardrobePetState extends State<WardrobePet>
         ),
         Expanded(
           child: TabBarView(controller: _tabController, children: [
-            TabPage(title: "Home", row1Name: "Hots", row2Name: "New", row1: backgroundItems, row2: shirtItems),
-            TabPage(title: "Shirts", row1Name: "Hots", row2Name: "New", row1: backgroundItems, row2: shirtItems),
-            TabPage(title: "Hats", row1Name: "Hots", row2Name: "New", row1: backgroundItems, row2: shirtItems),
-            TabPage(title: "Pets", row1Name: "Hots", row2Name: "New", row1: backgroundItems, row2: shirtItems),
+            TabPage(
+                title: "Home",
+                row1Name: "Hots",
+                row2Name: "New",
+                row1: backgroundItems1,
+                row2: backgroundItems2),
+            TabPage(
+                title: "Shirts",
+                row1Name: "Hots",
+                row2Name: "New",
+                row1: shirtItems1,
+                row2: shirtItems2),
+            TabPage(
+                title: "Hats",
+                row1Name: "Hots",
+                row2Name: "New",
+                row1: hatItems1,
+                row2: hatItems2),
+            TabPage(
+                title: "Pets",
+                row1Name: "Hots",
+                row2Name: "New",
+                row1: catItems1,
+                row2: catItems2),
           ]),
         ),
       ],
@@ -112,8 +222,7 @@ class TabPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(title,
-                style:
-                    TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           ),
           RowCategory(rowTitle: row1Name, items: row1),
           RowCategory(rowTitle: row2Name, items: row2),
