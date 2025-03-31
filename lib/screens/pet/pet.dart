@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/circularButton.dart';
 import 'chatpet.dart';
 import 'package:steadypunpipi_vhack/screens/pet/wardrobe.dart';
+import 'package:steadypunpipi_vhack/screens/pet/calendar.dart';
 
 class PetPage extends StatefulWidget {
   @override
@@ -47,7 +48,7 @@ class _PetPageState extends State<PetPage> {
                                 icon: Icons.chat_bubble_outline,
                                 onPressed: () {
                                   setState(() {
-                                    currentState = 2; // Show ChatPet
+                                    currentState = 1; // Show ChatPet
                                   });
                                 },
                               ),
@@ -56,14 +57,18 @@ class _PetPageState extends State<PetPage> {
                                 icon: Icons.shopping_bag_outlined,
                                 onPressed: () {
                                   setState(() {
-                                    currentState = 1; // Show WardrobePet
+                                    currentState = 2; // Show WardrobePet
                                   });
                                 },
                               ),
                               SizedBox(width: 10),
                               CircularButton(
                                 icon: Icons.event_note_outlined,
-                                onPressed: () {},
+                                onPressed: () {
+                                  setState(() {
+                                    currentState = 3; // Show WardrobePet
+                                  });
+                                },
                               ),
                             ],
                           ),
@@ -90,13 +95,13 @@ class _PetPageState extends State<PetPage> {
   Widget _getCurrentWidget() {
     switch (currentState) {
       case 1:
-        return WardrobePet();
-      case 2:
         return ChatPet();
-      //case 3:
-      //return CalendarPet(); // Replace with your CalendarPet widget
-      default:
+      case 2:
         return WardrobePet();
+      case 3:
+        return CalendarPet();
+      default:
+        return ChatPet();
     }
   }
 }
