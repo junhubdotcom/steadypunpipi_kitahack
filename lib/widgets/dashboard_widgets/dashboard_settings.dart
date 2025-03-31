@@ -5,10 +5,10 @@ class DashboardSettingsModal extends StatefulWidget {
   final Function(List<String>, Map<String, bool>) onSave;
 
   const DashboardSettingsModal({
-    super.key,
+    Key? key,
     required this.initialSections,
     required this.onSave,
-  });
+  }) : super(key: key);
 
   @override
   _DashboardSettingsModalState createState() => _DashboardSettingsModalState();
