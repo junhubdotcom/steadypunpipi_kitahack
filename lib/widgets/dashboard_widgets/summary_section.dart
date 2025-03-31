@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:steadypunpipi_vhack/common/constants.dart';
-import 'package:steadypunpipi_vhack/models/transaction.dart';
+import 'package:steadypunpipi_vhack/models/transaction_model.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/expandable_card.dart';
 
 class SummarySection extends StatelessWidget {
   final List<String> insights;
-  final List<Transaction> transactions;
+  final List<TransactionModel> transactions;
 
   const SummarySection({required this.insights, required this.transactions});
 

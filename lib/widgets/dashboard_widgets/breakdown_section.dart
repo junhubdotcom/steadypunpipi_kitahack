@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/models/breakdown_item.dart';
-import 'package:steadypunpipi_vhack/models/transaction.dart';
+import 'package:steadypunpipi_vhack/models/transaction_model.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/breakdown_tab.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/expandable_card.dart';
 
 class BreakdownSection extends StatelessWidget {
-  final List<Transaction> transactions;
+  final List<TransactionModel> transactions;
 
   const BreakdownSection({super.key, required this.transactions});
 
@@ -29,7 +29,7 @@ class BreakdownSection extends StatelessWidget {
   }
 }
 
-Widget expenseTab(BuildContext context, List<Transaction> transactions) {
+Widget expenseTab(BuildContext context, List<TransactionModel> transactions) {
   return buildBreakdownTab(
     context: context,
     title: "Expense",
@@ -40,7 +40,7 @@ Widget expenseTab(BuildContext context, List<Transaction> transactions) {
   );
 }
 
-Widget incomeTab(BuildContext context, List<Transaction> transactions) {
+Widget incomeTab(BuildContext context, List<TransactionModel> transactions) {
   return buildBreakdownTab(
     context: context,
     title: "Income",
@@ -51,7 +51,7 @@ Widget incomeTab(BuildContext context, List<Transaction> transactions) {
   );
 }
 
-Widget carbonTab(BuildContext context, List<Transaction> transactions) {
+Widget carbonTab(BuildContext context, List<TransactionModel> transactions) {
   return buildBreakdownTab(
     context: context,
     title: "CO₂ Emissions",
@@ -63,7 +63,7 @@ Widget carbonTab(BuildContext context, List<Transaction> transactions) {
 }
 
 /// **Process transactions based on type (expense/income)**
-List<BreakdownItem> processTransactions(List<Transaction> transactions, String type) {
+List<BreakdownItem> processTransactions(List<TransactionModel> transactions, String type) {
   Map<String, double> categoryTotals = {};
 
   for (var transaction in transactions) {
@@ -77,7 +77,7 @@ List<BreakdownItem> processTransactions(List<Transaction> transactions, String t
 }
 
 /// **Process CO₂ emissions from transactions**
-List<BreakdownItem> processCO2(List<Transaction> transactions) {
+List<BreakdownItem> processCO2(List<TransactionModel> transactions) {
   Map<String, double> categoryCO2 = {};
 
   for (var transaction in transactions) {

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:steadypunpipi_vhack/common/constants.dart';
 import 'package:steadypunpipi_vhack/models/finance_data.dart';
-import 'package:steadypunpipi_vhack/models/transaction.dart';
+import 'package:steadypunpipi_vhack/models/transaction_model.dart';
 import 'package:steadypunpipi_vhack/services/gemini_service.dart';
 import 'package:steadypunpipi_vhack/services/transaction_service.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/dashboard_settings.dart';
@@ -24,7 +24,7 @@ class _DashboardPageState extends State<DashboardPage> {
   final TransactionService _transactionService = TransactionService();
   final GeminiService _geminiService = GeminiService();
 
-  List<Transaction> transactions = [];
+  List<TransactionModel> transactions = [];
   List<FinanceCO2Data> trendData = [];
   Map<String, dynamic> geminiData = {
     "insights": [],

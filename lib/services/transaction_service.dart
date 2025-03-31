@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:steadypunpipi_vhack/models/breakdown_item.dart';
 import 'package:steadypunpipi_vhack/models/finance_data.dart';
-import 'package:steadypunpipi_vhack/models/transaction.dart';
+import 'package:steadypunpipi_vhack/models/transaction_model.dart';
 
 class TransactionService {
-  List<Transaction> _transactions = [];
+  List<TransactionModel> _transactions = [];
 
   // Load transactions from JSON file
   Future<void> loadTransactions() async {
@@ -17,7 +17,7 @@ class TransactionService {
       final data = json.decode(response);
 
       _transactions = (data['transactions'] as List)
-          .map((tx) => Transaction.fromJSON(tx))
+          .map((tx) => TransactionModel.fromJSON(tx))
           .toList();
 
       print("✅ Transactions loaded successfully: ${_transactions.length}");
@@ -43,12 +43,13 @@ class TransactionService {
   }
 
   // Filter transactions based on time range
-  List<Transaction> filterTransactions(DateTime startDate, DateTime endDate) {
+  List<TransactionModel> filterTransactions(
+      DateTime startDate, DateTime endDate) {
     print("📅 Filtering Transactions from $startDate to $endDate");
     print(
         "📜 All Transactions Dates: ${_transactions.map((tx) => tx.date).toList()}");
 
-    List<Transaction> filtered = _transactions.where((tx) {
+    List<TransactionModel> filtered = _transactions.where((tx) {
       bool isWithinRange =
           tx.date.isAfter(startDate.subtract(Duration(days: 1))) &&
               tx.date.isBefore(endDate.add(Duration(days: 1)));
@@ -115,7 +116,7 @@ class TransactionService {
   }
 
   Future<List<FinanceCO2Data>> processFCO2(
-      List<Transaction> transactions, String period) async {
+      List<TransactionModel> transactions, String period) async {
     await ensureTransactionsLoaded();
 
     Map<String, FinanceCO2Data> groupedData = {};

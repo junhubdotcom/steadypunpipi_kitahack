@@ -1,4 +1,4 @@
-class Transaction {
+class TransactionModel {
   final String id;
   final DateTime date;
   final String category;
@@ -7,7 +7,7 @@ class Transaction {
   final double? carbonFootprint;
   final String description;
 
-  Transaction({
+  TransactionModel({
     required this.id,
     required this.date,
     required this.category,
@@ -17,9 +17,9 @@ class Transaction {
     required this.description,
   });
 
-  // Convert JSON Map to Transaction Object
-  factory Transaction.fromJSON(Map<String, dynamic> map) {
-    return Transaction(
+  // Convert JSON Map to TransactionModel Object
+  factory TransactionModel.fromJSON(Map<String, dynamic> map) {
+    return TransactionModel(
       id: map['id'],
       date: DateTime.parse(map['date']),
       category: map['category'],
@@ -32,7 +32,7 @@ class Transaction {
     );
   }
 
-  // Convert Transaction Object to JSON Map
+  // Convert TransactionModel Object to JSON Map
   Map<String, dynamic> toJSON() {
     return {
       'id': id,
