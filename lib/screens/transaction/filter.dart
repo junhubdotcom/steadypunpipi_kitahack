@@ -26,12 +26,14 @@ class _FilterState extends State<Filter> {
       for (int i = 0; i < toggleSelections[groupIndex].length; i++) {
         toggleSelections[groupIndex][i] = (i == selectedIndex);
       }
-      if (selectedIndex == 0) {
-        _showDayPicker();
-      } else if (selectedIndex == 1) {
-        _showWeekPicker();
-      } else {
-        _showMonthPicker();
+      if (groupIndex == 0) {
+        if (selectedIndex == 0) {
+          _showDayPicker();
+        } else if (selectedIndex == 1) {
+          _showWeekPicker();
+        } else {
+          _showMonthPicker();
+        }
       }
     });
   }
@@ -294,7 +296,13 @@ class _FilterState extends State<Filter> {
   }
 
   String paymentMethodChosen = "Cash";
-  List<String> paymentMethod = ["Cash", "E-Wallet", "Online-Banking","Credit","Debit"];
+  List<String> paymentMethod = [
+    "Cash",
+    "E-Wallet",
+    "Online-Banking",
+    "Credit",
+    "Debit"
+  ];
 
   RangeValues values = const RangeValues(0, 1000);
   @override
@@ -415,7 +423,7 @@ class _FilterState extends State<Filter> {
                 },
               ),
               SizedBox(
-                height: 30,
+                height: 50,
               ),
               Align(
                 alignment: Alignment.center,
