@@ -3,7 +3,6 @@ import 'package:steadypunpipi_vhack/models/finance_data.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/expandable_card.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/expenseco2_chart.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/finance_bar_chart.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
 class TrendSection extends StatelessWidget {
   const TrendSection({super.key});

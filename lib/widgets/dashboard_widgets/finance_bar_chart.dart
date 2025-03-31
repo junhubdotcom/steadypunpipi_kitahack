@@ -6,7 +6,7 @@ class FinanceBarChart extends StatelessWidget {
   final List<FinanceCO2Data> data;
   final String title; // Title can be "Daily", "Weekly", or "Monthly"
 
-  FinanceBarChart({required this.data, required this.title});
+  const FinanceBarChart({super.key, required this.data, required this.title});
 
   @override
   Widget build(BuildContext context) {

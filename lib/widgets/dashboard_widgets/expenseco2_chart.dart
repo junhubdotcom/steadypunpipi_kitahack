@@ -6,8 +6,7 @@ class ExpenseCO2Chart extends StatelessWidget {
   final List<FinanceCO2Data> data;
   final String title; // "Daily", "Weekly", or "Monthly"
 
-  const ExpenseCO2Chart({required this.data, required this.title, Key? key})
-      : super(key: key);
+  const ExpenseCO2Chart({required this.data, required this.title, super.key});
 
   @override
   Widget build(BuildContext context) {
