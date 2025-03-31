@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:steadypunpipi_vhack/common/constants.dart';
 
 class ExpandableCard extends StatefulWidget {
@@ -14,7 +15,7 @@ class ExpandableCard extends StatefulWidget {
     required this.subtitle,
     required this.tabs,
     required this.tabViews,
-    this.icon = Icons.question_mark, // Default icon
+    this.icon = Icons.lightbulb,
   });
 
   @override
@@ -41,74 +42,96 @@ class _ExpandableCardState extends State<ExpandableCard>
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Section (Toggles Expansion)
+            // 🟡 Header Section (Toggles Expansion)
             GestureDetector(
-              onTap: _toggleExpand, // Toggle on tap
+              onTap: _toggleExpand,
               child: Row(
                 children: [
                   CircleAvatar(
-                    child: Icon(widget.icon, color: Colors.white),
-                    backgroundColor: AppConstants.infoColor,
+                    backgroundColor: Colors.blueGrey,
                     radius: 16,
+                    child: Icon(widget.icon, color: Colors.white, size: 20),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(widget.title,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold)),
-                        Text(widget.subtitle,
-                            style: const TextStyle(color: Colors.grey)),
+                        Text(
+                          widget.title,
+                          style: GoogleFonts.quicksand(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        Text(
+                          widget.subtitle,
+                          style: GoogleFonts.quicksand(
+                            color: Colors.black54,
+                            fontSize: 14,
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  Icon(_isExpanded
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down),
+                  Icon(
+                    _isExpanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    size: 28,
+                    color: Colors.grey.shade700,
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
-            // Expandable Content
+            // 🟢 Expandable Content
             AnimatedSize(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
-              child: ClipRect(
-                child: _isExpanded
-                    ? Column(
-                        children: [
-                          TabBar(
+              child: _isExpanded
+                  ? Column(
+                      children: [
+                        // 🔵 Tab Bar UI
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: TabBar(
                             controller: _tabController,
                             labelColor: Colors.black,
                             unselectedLabelColor: Colors.grey,
-                            indicatorColor: Colors.black,
+                            indicatorColor: AppConstants.primaryColor,
+                            indicatorWeight: 3,
                             tabs: widget.tabs,
                           ),
-                          const SizedBox(height: 12),
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            constraints: _isExpanded
-                                ? const BoxConstraints(maxHeight: 300)
-                                : const BoxConstraints(maxHeight: 0),
-                            child: TabBarView(
-                              controller: _tabController,
-                              children: widget.tabViews,
-                            ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // 🔴 TabBarView
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          constraints: BoxConstraints(
+                            maxHeight: _isExpanded ? 250 : 0,
                           ),
-                        ],
-                      )
-                    : const SizedBox(),
-              ),
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: widget.tabViews,
+                          ),
+                        ),
+                      ],
+                    )
+                  : const SizedBox(),
             ),
           ],
         ),

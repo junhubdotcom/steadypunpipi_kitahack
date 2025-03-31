@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:steadypunpipi_vhack/common/constants.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 
 class DateSelector extends StatefulWidget {
   final int selectedIndex;
-  final Function(int) onSelectionChanged;
+  final Function(int, DateTime) onSelectionChanged;
 
-  const DateSelector({super.key, required this.selectedIndex, required this.onSelectionChanged});
+  const DateSelector({
+    super.key,
+    required this.selectedIndex,
+    required this.onSelectionChanged,
+  });
 
   @override
   _DateSelectorState createState() => _DateSelectorState();
@@ -25,34 +30,61 @@ class _DateSelectorState extends State<DateSelector> {
   void _changeDate(int days) {
     setState(() {
       _selectedDate = _selectedDate.add(Duration(days: days));
+
+      if (_selectedIndex == 1) {
+        // Weekly
+        _selectedDate =
+            _selectedDate.subtract(Duration(days: _selectedDate.weekday - 1));
+      } else if (_selectedIndex == 2) {
+        // Monthly
+        _selectedDate = DateTime(_selectedDate.year, _selectedDate.month, 1);
+      }
     });
+    widget.onSelectionChanged(_selectedIndex, _selectedDate);
+  }
+
+  void _onSegmentChanged(int value) {
+    setState(() {
+      _selectedIndex = value;
+      widget.onSelectionChanged(value, _selectedDate);
+      _selectedDate = DateTime.now(); // Reset date when switching
+    });
+
+    widget.onSelectionChanged(_selectedIndex, _selectedDate);
+  }
+
+  DateTime get startDate {
+    switch (_selectedIndex) {
+      case 0:
+        return _selectedDate;
+      case 1:
+        return _selectedDate
+            .subtract(Duration(days: _selectedDate.weekday - 1));
+      case 2:
+        return DateTime(_selectedDate.year, _selectedDate.month, 1);
+      default:
+        return _selectedDate;
+    }
+  }
+
+  DateTime get endDate {
+    switch (_selectedIndex) {
+      case 0:
+        return _selectedDate;
+      case 1:
+        return startDate.add(Duration(days: 6));
+      case 2:
+        return DateTime(_selectedDate.year, _selectedDate.month + 1, 0);
+      default:
+        return _selectedDate;
+    }
   }
 
   String _getFormattedDateRange() {
-    DateTime startDate;
-    DateTime endDate;
-    String formattedDate;
-
-    switch (_selectedIndex) {
-      case 0: // Daily
-        formattedDate = _formatDate(_selectedDate);
-        break;
-      case 1: // Weekly
-        startDate =
-            _selectedDate.subtract(Duration(days: _selectedDate.weekday - 1));
-        endDate = startDate.add(Duration(days: 6));
-        formattedDate = "${_formatDate(startDate)} - ${_formatDate(endDate)}";
-        break;
-      case 2: // Monthly
-        startDate = DateTime(_selectedDate.year, _selectedDate.month, 1);
-        endDate = DateTime(_selectedDate.year, _selectedDate.month + 1, 0);
-        formattedDate = "${_formatDate(startDate)} - ${_formatDate(endDate)}";
-        break;
-      default:
-        return '';
+    if (_selectedIndex == 0) {
+      return _formatDate(startDate);
     }
-
-    return formattedDate;
+    return "${_formatDate(startDate)} - ${_formatDate(endDate)}";
   }
 
   String _formatDate(DateTime date) {
@@ -83,7 +115,7 @@ class _DateSelectorState extends State<DateSelector> {
       children: [
         _buildSegmentedControl(),
         Padding(
-          padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
+          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -96,9 +128,10 @@ class _DateSelectorState extends State<DateSelector> {
                         : _selectedIndex == 1
                             ? "This week"
                             : "This month",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     _getFormattedDateRange(),
                     style: TextStyle(fontSize: 14, color: Colors.grey[600]),
@@ -114,7 +147,7 @@ class _DateSelectorState extends State<DateSelector> {
                           : _selectedIndex == 1
                               ? 7
                               : 30))),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   _buildNavButton(
                       Icons.chevron_right,
                       () => _changeDate((_selectedIndex == 0
@@ -139,9 +172,10 @@ class _DateSelectorState extends State<DateSelector> {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            border: Border.all(color: Colors.grey.shade300, width: 1.5),
-            borderRadius: BorderRadius.circular(10.0)),
+          shape: BoxShape.rectangle,
+          border: Border.all(color: Colors.grey.shade300, width: 1.5),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
         child: Icon(icon, size: 20, color: Colors.black87),
       ),
     );
@@ -150,8 +184,9 @@ class _DateSelectorState extends State<DateSelector> {
   Widget _buildSegmentedControl() {
     return Center(
       child: Container(
-        width: 350, 
-        padding: EdgeInsets.all(AppConstants.paddingExtraSmall),
+        width: 350,
+        height: 40,
+        padding: const EdgeInsets.all(AppConstants.paddingExtraSmall),
         decoration: BoxDecoration(
           color: Colors.grey.shade300,
           borderRadius: BorderRadius.circular(30),
@@ -160,40 +195,11 @@ class _DateSelectorState extends State<DateSelector> {
           isStretch: true,
           initialValue: _selectedIndex,
           children: {
-            0: Text(
-              'Daily',
-              style: TextStyle(
-                fontSize: AppConstants.fontSizeMedium,
-                fontWeight: FontWeight.bold,
-                color: _selectedIndex == 0
-                    ? AppConstants.infoColor
-                    : Colors.black54,
-              ),
-            ),
-            1: Text(
-              'Weekly',
-              style: TextStyle(
-                fontSize: AppConstants.fontSizeMedium,
-                fontWeight: FontWeight.bold,
-                color: _selectedIndex == 1
-                    ? AppConstants.infoColor
-                    : Colors.black54,
-              ),
-            ),
-            2: Text(
-              'Monthly',
-              style: TextStyle(
-                fontSize: AppConstants.fontSizeMedium,
-                fontWeight: FontWeight.bold,
-                color: _selectedIndex == 2
-                    ? AppConstants.infoColor
-                    : Colors.black54,
-              ),
-            ),
+            0: _buildSegmentText("Daily", 0),
+            1: _buildSegmentText("Weekly", 1),
+            2: _buildSegmentText("Monthly", 2),
           },
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-          ),
+          decoration: const BoxDecoration(color: Colors.transparent),
           thumbDecoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(30),
@@ -202,18 +208,26 @@ class _DateSelectorState extends State<DateSelector> {
                 color: Colors.black.withOpacity(0.2),
                 blurRadius: 4.0,
                 spreadRadius: 1.0,
-                offset: Offset(0.0, 2.0),
+                offset: const Offset(0.0, 2.0),
               ),
             ],
           ),
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
-          onValueChanged: (value) {
-            setState(() {
-              _selectedIndex = value;
-            });
-          },
+          onValueChanged: _onSegmentChanged,
         ),
+      ),
+    );
+  }
+
+  Widget _buildSegmentText(String text, int index) {
+    return Text(
+      text,
+      style: GoogleFonts.quicksand(
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+        color:
+            _selectedIndex == index ? AppConstants.infoColor : Colors.black54,
       ),
     );
   }
