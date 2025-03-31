@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:steadypunpipi_vhack/common/constants.dart';
 
 class ExpandableCard extends StatefulWidget {
   final String title;
@@ -110,7 +109,7 @@ class _ExpandableCardState extends State<ExpandableCard>
                             controller: _tabController,
                             labelColor: Colors.black,
                             unselectedLabelColor: Colors.grey,
-                            indicatorColor: AppConstants.primaryColor,
+                            indicatorColor: Colors.blue,
                             indicatorWeight: 3,
                             tabs: widget.tabs,
                           ),
