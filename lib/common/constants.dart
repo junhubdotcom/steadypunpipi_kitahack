@@ -9,8 +9,9 @@ class AppConstants {
   static const String baseUrl = "https://api.yourserver.com";
   static const String transactionsEndpoint = "$baseUrl/transactions";
   static const String carbonEndpoint = "$baseUrl/carbon";
+
   static const String GEMINI_API_KEY =
-      "AIzaSyDUWwvMOPR7sowCBa4MVaN_TMYgrMJqKWs";
+      "AIzaSyDvgydDIgm2BnHGmzghqGIQSgzvRitkDkA";
   static const String GOOGLE_VISION_API_KEY =
       "AIzaSyAOKtlOJCS_N38VLCnBZ5LY08BHy2Bc3XA";
   static const String TRANSACTION_GEMINI_API_KEY =
