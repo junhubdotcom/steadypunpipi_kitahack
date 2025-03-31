@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:steadypunpipi_vhack/widgets/transaction_container.dart';
+import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_container.dart';
 
 class TransactionList extends StatelessWidget {
   const TransactionList({super.key});
@@ -19,12 +19,14 @@ class TransactionList extends StatelessWidget {
                 Text(
                   '31',
                   style: GoogleFonts.quicksand(
-                      fontSize: 20, fontWeight: FontWeight.bold),
+                      fontSize: MediaQuery.of(context).size.width * 0.05,
+                      fontWeight: FontWeight.bold),
                 ),
                 Text(
                   'March',
                   style: GoogleFonts.quicksand(
-                      fontSize: 20, fontWeight: FontWeight.bold),
+                      fontSize: MediaQuery.of(context).size.width * 0.05,
+                      fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -34,7 +36,7 @@ class TransactionList extends StatelessWidget {
                   '+RM 10.00',
                   style: GoogleFonts.quicksand(
                       color: Color(0xff58c849),
-                      fontSize: 16,
+                      fontSize: MediaQuery.of(context).size.width * 0.040,
                       fontWeight: FontWeight.w700),
                 ),
                 SizedBox(
@@ -44,7 +46,7 @@ class TransactionList extends StatelessWidget {
                   '-RM50.00',
                   style: GoogleFonts.quicksand(
                       color: Color(0xffcd5151),
-                      fontSize: 16,
+                      fontSize: MediaQuery.of(context).size.width * 0.040,
                       fontWeight: FontWeight.w700),
                 ),
                 SizedBox(
@@ -53,8 +55,7 @@ class TransactionList extends StatelessWidget {
                 Text(
                   '+26CO2e',
                   style: GoogleFonts.quicksand(
-                      color: Color(0xff7e7e7e),
-                      fontSize: 16,
+                      fontSize: MediaQuery.of(context).size.width * 0.040,
                       fontWeight: FontWeight.w700),
                 ),
               ],

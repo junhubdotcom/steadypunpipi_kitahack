@@ -4,9 +4,8 @@ import 'package:flutter_gemini/flutter_gemini.dart';
 import 'route.dart';
 
 void main() {
-  Gemini.init(
-    apiKey: AppConstants.GEMINI_API_KEY
-  );
+  Gemini.init(apiKey: AppConstants.GEMINI_API_KEY);
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -56,7 +55,10 @@ class _MainScreenState extends State<MainScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50.0),
           ),
-          child: Icon(Icons.pets, size: 30,),
+          child: Icon(
+            Icons.pets,
+            size: 30,
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

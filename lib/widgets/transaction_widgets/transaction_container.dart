@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:steadypunpipi_vhack/screens/transaction_details.dart';
-import 'package:steadypunpipi_vhack/widgets/label.dart';
+import 'package:steadypunpipi_vhack/screens/transaction/transaction_details.dart';
+import 'package:steadypunpipi_vhack/widgets/transaction_widgets/label.dart';
 
 class TransactionContainer extends StatelessWidget {
   const TransactionContainer({super.key});
