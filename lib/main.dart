@@ -4,9 +4,8 @@ import 'package:flutter_gemini/flutter_gemini.dart';
 import 'route.dart';
 
 void main() {
-  Gemini.init(
-    apiKey: AppConstants.GEMINI_API_KEY
-  );
+  Gemini.init(apiKey: AppConstants.GEMINI_API_KEY);
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -53,7 +52,10 @@ class _MainScreenState extends State<MainScreen> {
           onPressed: () {
             _onTabTapped(2); // Navigate to the PetPage
           },
-          child: Icon(Icons.pets, size: 30,),
+          child: Icon(
+            Icons.pets,
+            size: 30,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50.0),
           ),
