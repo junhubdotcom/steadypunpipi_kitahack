@@ -294,7 +294,7 @@ class _FilterState extends State<Filter> {
   }
 
   String paymentMethodChosen = "Cash";
-  List<String> paymentMethod = ["Cash", "E-Wallet", "Online-Banking"];
+  List<String> paymentMethod = ["Cash", "E-Wallet", "Online-Banking","Credit","Debit"];
 
   RangeValues values = const RangeValues(0, 1000);
   @override

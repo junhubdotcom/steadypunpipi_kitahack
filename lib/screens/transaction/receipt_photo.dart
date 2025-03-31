@@ -58,9 +58,10 @@ class _ReceiptPhotoState extends State<ReceiptPhoto> {
                       backgroundColor: Colors.white,
                       shape: CircleBorder(),
                       onPressed: () async {
+                        print("Generate Content");
                         Transaction transaction =
                             await _apiService.generateContent(widget.imgPath);
-
+                        print("Content Generated");
                         Navigator.push(
                             context,
                             MaterialPageRoute(

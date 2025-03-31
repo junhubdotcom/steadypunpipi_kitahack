@@ -231,7 +231,13 @@ class _RecordTransactionState extends State<RecordTransaction> {
                   value: widget.transaction.paymentMethod,
                   onChanged: (value) =>
                       widget.transaction.paymentMethod = value!,
-                  items: ['Cash', 'E-Wallet', 'Online Banking']),
+                  items: [
+                    'Cash',
+                    'E-Wallet',
+                    'Online Banking',
+                    'Credit',
+                    'Debit'
+                  ]),
               SmallTitle(title: 'Time'),
               Container(
                 height: 43,

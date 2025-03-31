@@ -11,9 +11,11 @@ class ApiService {
 
   Future<Transaction> generateContent(String imgPath) async {
     try {
-      final image = File(imgPath);
-      final bytes = await image.readAsBytes();
-      final String mimeType = 'image/jpeg';
+      // final image = File(imgPath);
+      // final bytes = await image.readAsBytes();
+      // final String mimeType = 'image/jpeg';
+
+      print("Continue 1");
 
       // Get google vision result
       final visionResult = await classifyImage(imgPath);
@@ -28,7 +30,7 @@ class ApiService {
       }
 
       final String prompt = '''
-You are a financial assistant AI. I will give you two things: (1) a receipt image and (2) its OCR result. Your job is to analyze both and return a **pure JSON** response with **no explanation or extra text**.
+You are a financial assistant AI. I will give you the receipt's OCR result. Your job is to analyze both and return a **pure JSON** response with **no explanation or extra text**.
 
 Use the following JSON schema:
 
@@ -56,7 +58,7 @@ Instructions:
 - Estimate carbon_footprint as realistically as possible based on your knowledge of the item type
 - If more than one item, set "isMultipleItem": true and generate a meaningful "transactionName"
 - If only one item, set "isMultipleItem": false and "transactionName": "none"
-- Detect payment method from any mention of "Cash", "GrabPay", "TNG", "FPX", etc., and normalize to one of the three options: "Cash", "E-Wallet", or "Online Banking"
+- Detect payment method from any mention of "Cash", "GrabPay", "TNG", "FPX", etc., and normalize to one of the five options: "Cash", "E-Wallet", "Online Banking","Credit", or "Debit"
 
 Important:
 Return only the raw JSON object. Do not wrap it in triple backticks (```) or any markdown formatting.
@@ -64,12 +66,15 @@ Do not prefix with json or any other label.
 Do not include any explanation, comments, or surrounding text — just output the JSON itself so it can be parsed directly.
 
 Inputs:
-1. This receipt image: $imgPath
-2. This OCR text: $visionResult
+1. This OCR text: $visionResult
 ''';
 
+      // final response = await _model.generateContent([
+      //   Content.multi([TextPart("$prompt"), DataPart(mimeType, bytes)])
+      // ]);
+
       final response = await _model.generateContent([
-        Content.multi([TextPart("$prompt"), DataPart(mimeType, bytes)])
+        Content.text(prompt),
       ]);
 
       print("Response");
@@ -87,10 +92,10 @@ Inputs:
     try {
       final bytes = File(imagePath).readAsBytesSync();
       final String base64Image = base64Encode(bytes);
-
+      print("Continue 2");
       final response = await http.post(
         Uri.parse(
-            "https://vision.googleapis.com/v1/images:annotate?key= ${AppConstants.GOOGLE_VISION_API_KEY}"),
+            "https://vision.googleapis.com/v1/images:annotate?key=${AppConstants.GOOGLE_VISION_API_KEY}"),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'requests': [
@@ -104,6 +109,7 @@ Inputs:
         }),
       );
 
+      print("Continue 3");
       if (response.statusCode == 200) {
         print(response.body);
         return jsonDecode(response.body);
