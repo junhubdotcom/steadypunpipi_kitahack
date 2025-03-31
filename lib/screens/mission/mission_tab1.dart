@@ -1,7 +1,9 @@
 import 'package:dashed_circular_progress_bar/dashed_circular_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:steadypunpipi_vhack/widgets/mission_widgets/listview.dart';
+import 'package:steadypunpipi_vhack/screens/mission/more_fingoal.dart';
+import 'package:steadypunpipi_vhack/screens/mission/more_susquest.dart';
+import 'package:steadypunpipi_vhack/widgets/mission_widgets/goalsquests.dart';
 import 'package:steadypunpipi_vhack/widgets/mission_widgets/toggle.dart';
 
 class MissionTab1 extends StatefulWidget {
@@ -14,6 +16,8 @@ class MissionTab1 extends StatefulWidget {
 class _MissionTab1State extends State<MissionTab1> {
 
   int _toggleValue = 0;
+  int _checkedIn = 0;
+  int exp = 150;
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +26,9 @@ class _MissionTab1State extends State<MissionTab1> {
         _buildDailyCheckIn(),
         SizedBox(height: 21),
         _buildFinancialGoals(),
-        SizedBox(height: 21),
+        SizedBox(height: 15),
         _buildSustainableQuests(),
-        SizedBox(height: 21),
+        SizedBox(height: 15),
         _buildLeaderboard(),
         Container(
           decoration: BoxDecoration(
@@ -54,7 +58,7 @@ class _MissionTab1State extends State<MissionTab1> {
             children: [
               DashedCircularProgressBar.square(
                 dimensions: 210,
-                progress: (1 / 7) * 100,
+                progress: (_checkedIn / 7) * 100,
                 startAngle: 230,
                 sweepAngle: 290,
                 foregroundColor: Colors.green,
@@ -90,13 +94,18 @@ class _MissionTab1State extends State<MissionTab1> {
         ),
         Center(
           child: GestureDetector(
+            onTap: () {
+              setState(() {
+                _checkedIn = _checkedIn + 1;
+              });
+            },
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: Color(0xFFDCE8D6),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text('See you tomorrow!',
+              child: Text(_checkedIn == 0 ? 'Check In' : 'See you tomorrow!',
                 style: GoogleFonts.quicksand(
                   color: Colors.black,
                   fontSize: 12,
@@ -112,74 +121,43 @@ class _MissionTab1State extends State<MissionTab1> {
   }
 
   Widget _buildFinancialGoals() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              'Financial Goals',
-              style: GoogleFonts.quicksand(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(width: 9),
-            GestureDetector(
-              child: Icon(Icons.arrow_forward, size: 18),
-            ),
-          ],
-        ),
-        SizedBox(height: 12),
-        Center(
-          child: Card(
-            color: Color(0xFFFFEDCA),
-            child: ListviewWidget(
-              asset: Image.asset('assets/images/Flag_of_Thailand.png', width: 40), 
-              title: 'Trip to Thailand', 
-              hexColor: 0xFFFFCF10,
-              progress: '956 / 1200',
-              unit: 'MYR',
-              rewards: ['12 exp'],
-            ),
-          ),
+    return GoalQuestsWidget(
+      title: 'Financial Goals',
+      onSeeAllPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MoreFingoal()),
+        );
+      },
+      contents: [
+        GoalQuestsCard(
+          icon: Image.asset('assets/images/Flag_of_Thailand.png', width: 40,),
+          title: 'Trip to Thailand',
+          barColor: 0xFFFFCF10,
+          bgColor: 0xFFFFEDCA,
+          progress: '956 / 1200',
+          unit: 'MYR',
+          rewards: ['12 exp'],
         ),
       ],
     );
   }
 
   Widget _buildSustainableQuests() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              'Sustainable Quests',
-              style: GoogleFonts.quicksand(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(width: 9),
-            GestureDetector(
-              child: Icon(Icons.arrow_forward, size: 18),
-            ),
-          ],
-        ),
-        SizedBox(height: 12),
-        Center(
-          child: Card(
-            color: Colors.green[100],
-            child: ListviewWidget(
-              asset: Icon(Icons.train_rounded, size: 40), 
-              title: 'Public Transport Week', 
-              hexColor: 0xFF36BB6D, 
-              progress: '2 / 7', 
-              unit: 'days', 
-              rewards: ['30 exp', '30 points'],
-            )
-          ),
+    return GoalQuestsWidget(
+    title: 'Sustainable Quests',
+      onSeeAllPressed: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => MoreSusquest()));
+      },
+      contents: [
+        GoalQuestsCard(
+          icon: Icon(Icons.train_rounded, size: 40),
+          title: 'Public Transport Week',
+          barColor: 0xFF36BB6D,
+          bgColor: 0xFFDCE8D6,
+          progress: '2 / 7',
+          unit: 'days',
+          rewards: ['30 exp', '30 points'],
         ),
       ],
     );
@@ -196,6 +174,7 @@ class _MissionTab1State extends State<MissionTab1> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        SizedBox(height: 16),
         _buildTitle(),
         _buildProgressBar(),
         SizedBox(height: 16),
@@ -227,11 +206,11 @@ class _MissionTab1State extends State<MissionTab1> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text("150 exp", style: GoogleFonts.quicksand(fontWeight: FontWeight.bold)),
+                    Text("$exp exp", style: GoogleFonts.quicksand(fontWeight: FontWeight.bold)),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: LinearProgressIndicator(
-                      value: 150 / 450,
+                      value: exp / 450,
                       minHeight: 8,
                       backgroundColor: Colors.grey[300],
                       color: Colors.amber,

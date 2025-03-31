@@ -9,6 +9,10 @@ class MissionTab2 extends StatefulWidget {
 }
 
 class _MissionTab2State extends State<MissionTab2> {
+  int points = 150;
+  List<bool> rewardBookmarks = [false, false, false, false];
+  bool showBookmarkedOnly = false;
+  String searchQuery = "";
 
   @override
   Widget build(BuildContext context) {
@@ -60,17 +64,22 @@ class _MissionTab2State extends State<MissionTab2> {
     return SizedBox(
       height: 50,
       child: TextField(
-      decoration: InputDecoration(
-        prefixIcon: Icon(Icons.search),
-        hintText: "Search",
-        border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: Colors.black),
+        onChanged: (value) {
+          setState(() {
+            searchQuery = value.toLowerCase();
+          });
+        },
+        decoration: InputDecoration(
+          prefixIcon: Icon(Icons.search),
+          hintText: "Search",
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: Colors.black),
+          ),
+          filled: true,
+          fillColor: Colors.transparent,
+          contentPadding: EdgeInsets.zero,
         ),
-        filled: true,
-        fillColor: Colors.transparent,
-        contentPadding: EdgeInsets.zero,
-      ),
       ),
     );
   }
@@ -80,45 +89,38 @@ class _MissionTab2State extends State<MissionTab2> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Text("Bookmark only", style: GoogleFonts.quicksand(fontSize: 12)),
-        Checkbox(value: false, onChanged: (value) {}),
+        Checkbox(
+          value: showBookmarkedOnly,
+          onChanged: (value) {
+            setState(() {
+              showBookmarkedOnly = value ?? false;
+            });
+          },
+        ),
       ],
     );
   }
 
   Widget _buildRewardsList() {
     List<RewardItem> rewards = [
-      RewardItem(
-        "10% Google Cloud", 
-        "Discount voucher", 
-        "1000 points",
-        Image.asset("assets/images/google.png", width: 45, height: 45), 
-        Colors.green[100]!
-      ),
-      RewardItem(
-        "WWF", 
-        "Donation", 
-        "150 points",
-        Image.asset("assets/images/wwf.png", width: 45, height: 45), 
-        Colors.blueGrey[100]!
-      ),
-      RewardItem(
-        "10% Google Cloud", 
-        "Discount voucher", 
-        "1000 points",
-        Image.asset("assets/images/google.png", width: 45, height: 45), 
-        Colors.green[100]!
-      ),
-      RewardItem(
-        "WWF", 
-        "Donation", 
-        "150 points",
-        Image.asset("assets/images/wwf.png", width: 45, height: 45), 
-        Colors.blueGrey[100]!
-      ),
+      RewardItem(0, "10% Google Cloud", "Discount voucher", "1000 points",
+          Image.asset("assets/images/google.png", width: 45, height: 45), Colors.green[100]!),
+      RewardItem(1, "WWF", "Donation", "$points points",
+          Image.asset("assets/images/wwf.png", width: 45, height: 45), Colors.blueGrey[100]!),
+      RewardItem(2, "10% Google Cloud", "Discount voucher", "1000 points",
+          Image.asset("assets/images/google.png", width: 45, height: 45), Colors.green[100]!),
+      RewardItem(3, "WWF", "Donation", "150 points",
+          Image.asset("assets/images/wwf.png", width: 45, height: 45), Colors.blueGrey[100]!),
     ];
 
+    List<RewardItem> filteredRewards = rewards.where((reward) {
+      final matchesBookmark = !showBookmarkedOnly || rewardBookmarks[reward.index];
+      final matchesSearch = reward.title.toLowerCase().contains(searchQuery);
+      return matchesBookmark && matchesSearch;
+    }).toList();
+
     return Column(
-      children: rewards.map((reward) => _buildRewardCard(reward)).toList(),
+      children: filteredRewards.map((reward) => _buildRewardCard(reward)).toList(),
     );
   }
 
@@ -132,34 +134,29 @@ class _MissionTab2State extends State<MissionTab2> {
             color: reward.backgroundColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Padding(
-                padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 16.0),
+              padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 16.0),
               child: Row(
                 children: [
                   SizedBox(width: 18),
                   CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.white,
-                  child: reward.image,
+                    radius: 30,
+                    backgroundColor: Colors.white,
+                    child: reward.image,
                   ),
                   SizedBox(width: 15),
                   Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                    Text(
-                      reward.title,
-                      style: GoogleFonts.quicksand(fontSize: 15, fontWeight: FontWeight.bold),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(reward.title,
+                            style: GoogleFonts.quicksand(fontSize: 15, fontWeight: FontWeight.bold)),
+                        Text(reward.subtitle,
+                            style: GoogleFonts.quicksand(fontSize: 12, fontWeight: FontWeight.normal)),
+                        SizedBox(height: 6),
+                        Text(reward.points,
+                            style: GoogleFonts.quicksand(fontSize: 15, fontWeight: FontWeight.bold)),
+                      ],
                     ),
-                    Text(
-                      reward.subtitle, 
-                      style: GoogleFonts.quicksand(fontSize: 12, fontWeight: FontWeight.normal)),
-                    SizedBox(height: 6),
-                    Text(
-                      reward.points,
-                      style: GoogleFonts.quicksand(fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                    ],
-                  ),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -170,10 +167,10 @@ class _MissionTab2State extends State<MissionTab2> {
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
                         borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(83),
-                        topRight: Radius.circular(15),
-                        bottomLeft: Radius.circular(82),
-                        bottomRight: Radius.circular(15),
+                          topLeft: Radius.circular(83),
+                          topRight: Radius.circular(15),
+                          bottomLeft: Radius.circular(82),
+                          bottomRight: Radius.circular(15),
                         ),
                       ),
                       padding: EdgeInsets.all(8),
@@ -187,7 +184,18 @@ class _MissionTab2State extends State<MissionTab2> {
         ),
         Padding(
           padding: const EdgeInsets.only(left: 9.0),
-          child: Icon(Icons.bookmark_border_rounded, color: Colors.black, size: 30),
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                rewardBookmarks[reward.index] = !rewardBookmarks[reward.index];
+              });
+            },
+            child: Icon(
+              rewardBookmarks[reward.index] ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+              color: Colors.black,
+              size: 30,
+            ),
+          ),
         ),
       ],
     );
@@ -195,11 +203,12 @@ class _MissionTab2State extends State<MissionTab2> {
 }
 
 class RewardItem {
+  final int index;
   final String title;
   final String subtitle;
   final String points;
   final Widget image;
   final Color backgroundColor;
 
-  RewardItem(this.title, this.subtitle, this.points, this.image, this.backgroundColor);
+  RewardItem(this.index, this.title, this.subtitle, this.points, this.image, this.backgroundColor);
 }
