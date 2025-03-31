@@ -3,6 +3,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:steadypunpipi_vhack/screens/transaction/filter.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/record_transaction.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/scanner.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/indicator.dart';
@@ -14,6 +15,29 @@ class TransactionPage extends StatefulWidget {
 }
 
 class _TransactionPageState extends State<TransactionPage> {
+  // Color getCategoryColor(String category) {
+  //   switch (category) {
+  //     case 'Food':
+  //       return Colors.redAccent;
+  //     case 'Housing':
+  //       return Colors.indigoAccent;
+  //     case 'Debt Repayment':
+  //       return Colors.deepOrangeAccent;
+  //     case 'Medical':
+  //       return Colors.greenAccent;
+  //     case 'Transport':
+  //       return Colors.blueAccent;
+  //     case 'Utilities':
+  //       return Colors.amberAccent;
+  //     case 'Shopping':
+  //       return Colors.purpleAccent;
+  //     case 'Tax':
+  //       return Colors.brown;
+  //     default:
+  //       return Colors.grey;
+  //   }
+  // }
+
   String displayMonth = DateFormat('MMMM yyyy').format(DateTime.now());
   DateTime selectedMonth = DateTime.now();
   String formattedMonth = '';
@@ -114,11 +138,13 @@ class _TransactionPageState extends State<TransactionPage> {
         actions: [
           IconButton(
               onPressed: () {
-                showModalBottomSheet(
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (context) => buildSheet(),
-                );
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => Filter()));
+                // showModalBottomSheet(
+                //   isScrollControlled: true,
+                //   context: context,
+                //   builder: (context) => buildSheet(),
+                // );
               },
               icon: Icon(Icons.filter_alt_outlined))
         ],
@@ -220,25 +246,74 @@ class _TransactionPageState extends State<TransactionPage> {
     );
   }
 
-  Widget buildSheet() => Container(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height * 0.90,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-        child: Column(mainAxisSize: MainAxisSize.max, children: [
-          Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                icon: Icon(Icons.close_rounded),
-                iconSize: 35,
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          )
-        ]),
-      ));
+  // Widget buildSheet() {
+  //   return StatefulBuilder(builder: (context, setStateSheet) {
+  //     return Container(
+  //         width: double.infinity,
+  //         height: MediaQuery.of(context).size.height * 0.90,
+  //         child: Padding(
+  //           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+  //           child: Column(mainAxisSize: MainAxisSize.max, children: [
+  //             Row(
+  //               mainAxisSize: MainAxisSize.max,
+  //               mainAxisAlignment: MainAxisAlignment.end,
+  //               children: [
+  //                 IconButton(
+  //                   icon: Icon(Icons.close_rounded),
+  //                   iconSize: 35,
+  //                   onPressed: () {
+  //                     Navigator.pop(context);
+  //                   },
+  //                 ),
+  //               ],
+  //             ),
+  //             SmallTitle(title: "Date"),
+  //             SmallTitle(title: "Category"),
+  //             Wrap(
+  //               alignment: WrapAlignment.start,
+  //               spacing: 10,
+  //               runSpacing: 5,
+  //               children: categories.map((category) {
+  //                 final isSelected = selectedCategories.contains(category);
+
+  //                 return FilterChip(
+  //                     // padding:
+  //                     //     EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+  //                     label: Row(
+  //                       mainAxisSize: MainAxisSize.min,
+  //                       children: [
+  //                         Icon(
+  //                           getCategoryIcon(category),
+  //                           size: 20,
+  //                         ),
+  //                         SizedBox(
+  //                           width: 5,
+  //                         ),
+  //                         Text(category),
+  //                       ],
+  //                     ),
+  //                     // avatar: Icon(
+  //                     //   getCategoryIcon(category),
+  //                     //   size: 20,
+  //                     // ),
+  //                     selected: isSelected,
+  //                     showCheckmark: false,
+  //                     onSelected: (bool selected) {
+  //                       setStateSheet(() {
+  //                         if (selected) {
+  //                           selectedCategories.add(category);
+  //                         } else {
+  //                           selectedCategories.remove(category);
+  //                         }
+  //                       });
+  //                     });
+  //               }).toList(),
+  //             ),
+  //             SmallTitle(title: "Transaction Type"),
+  //             SmallTitle(title: "Payment Method"),
+  //             SmallTitle(title: "Amount Method"),
+  //           ]),
+  //         ));
+  //   });
+  // }
 }
