@@ -32,19 +32,8 @@ class _RecordTransactionState extends State<RecordTransaction> {
 
   String category_dropdown_value = "Food";
 
-  // List<String?> uploadedImages = List.generate(2, (_) => null);
 
-  void receiptOnTap() {
-    pickImageFromGallery(ImageSource.gallery, true);
-    Navigator.pop(context);
-  }
-
-  void thingImageOnTap() {
-    pickImageFromGallery(ImageSource.gallery, false);
-    Navigator.pop(context);
-  }
-
-  Future pickImageFromGallery(ImageSource source, bool isReceipt) async {
+  Future pickImage(ImageSource source, bool isReceipt) async {
     try {
       XFile? image = await ImagePicker().pickImage(source: source);
       if (image == null) return;
@@ -59,6 +48,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
     } on PlatformException catch (e) {
       print("Failed to pick image: $e");
     }
+    Navigator.pop(context);
   }
 
   Future pickDateTime() async {
@@ -275,16 +265,21 @@ class _RecordTransactionState extends State<RecordTransaction> {
                     title: Text(
                       'Add from Gallery',
                     ),
-                    onTap: receiptOnTap,
+                    onTap: () {
+                      pickImage(ImageSource.gallery, true);
+                    },
                   ),
                   ListTile(
-                      leading: Icon(
-                        Icons.camera_alt,
-                      ),
-                      title: Text(
-                        'Take Photo',
-                      ),
-                      onTap: receiptOnTap),
+                    leading: Icon(
+                      Icons.camera_alt,
+                    ),
+                    title: Text(
+                      'Take Photo',
+                    ),
+                    onTap: () {
+                      pickImage(ImageSource.camera, true);
+                    },
+                  ),
                   ListTile(
                     leading: Icon(Icons.document_scanner_sharp),
                     title: Text('Scan Receipt'),
@@ -308,7 +303,9 @@ class _RecordTransactionState extends State<RecordTransaction> {
                   title: Text(
                     'Add from Gallery',
                   ),
-                  onTap: thingImageOnTap,
+                  onTap: () {
+                    pickImage(ImageSource.gallery, false);
+                  },
                 ),
                 ListTile(
                   leading: Icon(
@@ -317,7 +314,9 @@ class _RecordTransactionState extends State<RecordTransaction> {
                   title: Text(
                     'Take Photo',
                   ),
-                  onTap: thingImageOnTap,
+                  onTap: () {
+                    pickImage(ImageSource.camera, false);
+                  },
                 ),
               ], imgPath: thing_image),
               SizedBox(
