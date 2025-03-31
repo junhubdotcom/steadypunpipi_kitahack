@@ -5,7 +5,7 @@ class CircularButton extends StatelessWidget {
   final VoidCallback onPressed;
   final double opacity;
 
-  const CircularButton({
+  const CircularButton({super.key, 
     required this.icon,
     required this.onPressed,
     this.opacity = 0.4,

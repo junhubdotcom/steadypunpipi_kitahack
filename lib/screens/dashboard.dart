@@ -7,6 +7,8 @@ import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/tips_section.dart'
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/trend_section.dart';
 
 class DashboardPage extends StatefulWidget {
+  const DashboardPage({super.key});
+
   @override
   _DashboardPageState createState() => _DashboardPageState();
 }
@@ -132,7 +134,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildCard(String title, String content) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

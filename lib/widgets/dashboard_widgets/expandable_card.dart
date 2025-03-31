@@ -53,9 +53,9 @@ class _ExpandableCardState extends State<ExpandableCard>
               child: Row(
                 children: [
                   CircleAvatar(
-                    child: Icon(widget.icon, color: Colors.white),
                     backgroundColor: AppConstants.infoColor,
                     radius: 16,
+                    child: Icon(widget.icon, color: Colors.white),
                   ),
                   const SizedBox(width: 8),
                   Expanded(

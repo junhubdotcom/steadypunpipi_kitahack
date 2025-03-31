@@ -1,8 +1,23 @@
 import 'package:dashed_circular_progress_bar/dashed_circular_progress_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:steadypunpipi_vhack/screens/mission/more_fingoal.dart';
+import 'package:steadypunpipi_vhack/screens/mission/more_susquest.dart';
+import 'package:steadypunpipi_vhack/widgets/mission_widgets/goalsquests.dart';
+import 'package:steadypunpipi_vhack/widgets/mission_widgets/toggle.dart';
 
-class MissionTab1 extends StatelessWidget {
+class MissionTab1 extends StatefulWidget {
   const MissionTab1({super.key});
+
+  @override
+  State<MissionTab1> createState() => _MissionTab1State();
+}
+
+class _MissionTab1State extends State<MissionTab1> {
+
+  int _toggleValue = 0;
+  int _checkedIn = 0;
+  int exp = 150;
 
   @override
   Widget build(BuildContext context) {
@@ -11,10 +26,16 @@ class MissionTab1 extends StatelessWidget {
         _buildDailyCheckIn(),
         SizedBox(height: 21),
         _buildFinancialGoals(),
-        SizedBox(height: 21),
+        SizedBox(height: 15),
         _buildSustainableQuests(),
-        SizedBox(height: 21),
-        _buildLeaderboard()
+        SizedBox(height: 15),
+        _buildLeaderboard(),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+          ),
+          height: 24
+        ),
       ],
     );
   }
@@ -25,8 +46,8 @@ class MissionTab1 extends StatelessWidget {
       children: [
         Text(
           'Daily Check-in',
-          style: TextStyle(
-            fontSize: 18,
+          style: GoogleFonts.quicksand(
+            fontSize: 15,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -37,7 +58,7 @@ class MissionTab1 extends StatelessWidget {
             children: [
               DashedCircularProgressBar.square(
                 dimensions: 210,
-                progress: (1 / 7) * 100,
+                progress: (_checkedIn / 7) * 100,
                 startAngle: 230,
                 sweepAngle: 290,
                 foregroundColor: Colors.green,
@@ -57,12 +78,12 @@ class MissionTab1 extends StatelessWidget {
                   Image.asset('assets/images/forest.png', width: 120),
                   SizedBox(height: 8),
                   Text('150',
-                      style: TextStyle(
+                      style: GoogleFonts.quicksand(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           height: 0)),
                   Text('points',
-                      style: TextStyle(
+                      style: GoogleFonts.quicksand(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
                           height: 0)),
@@ -72,18 +93,27 @@ class MissionTab1 extends StatelessWidget {
           ),
         ),
         Center(
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFDCE8D6),
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                _checkedIn = _checkedIn + 1;
+              });
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Color(0xFFDCE8D6),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(_checkedIn == 0 ? 'Check In' : 'See you tomorrow!',
+                style: GoogleFonts.quicksand(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  height: 0
+                )
+              ),
             ),
-            child: Text('See you tomorrow!',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    height: 0)),
           ),
         ),
       ],
@@ -91,92 +121,43 @@ class MissionTab1 extends StatelessWidget {
   }
 
   Widget _buildFinancialGoals() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              'Financial Goals',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(width: 9),
-            GestureDetector(
-              child: Icon(Icons.arrow_forward, size: 18),
-            ),
-          ],
-        ),
-        SizedBox(height: 12),
-        Center(
-          child: Card(
-            color: Colors.amber[100],
-            child: ListTile(
-              leading:
-                  Image.network('https://flagcdn.com/w40/th.png', width: 40),
-              title: Text('Trip to Thailand'),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  LinearProgressIndicator(value: 956 / 1200, minHeight: 8),
-                  SizedBox(height: 4),
-                  Text('RM 956 / 1200'),
-                ],
-              ),
-              trailing: Text('12 exp'),
-            ),
-          ),
+    return GoalQuestsWidget(
+      title: 'Financial Goals',
+      onSeeAllPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MoreFingoal()),
+        );
+      },
+      contents: [
+        GoalQuestsCard(
+          icon: Image.asset('assets/images/Flag_of_Thailand.png', width: 40,),
+          title: 'Trip to Thailand',
+          barColor: 0xFFFFCF10,
+          bgColor: 0xFFFFEDCA,
+          progress: '956 / 1200',
+          unit: 'MYR',
+          rewards: ['12 exp'],
         ),
       ],
     );
   }
 
   Widget _buildSustainableQuests() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              'Sustainable Quests',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(width: 9),
-            GestureDetector(
-              child: Icon(Icons.arrow_forward, size: 18),
-            ),
-          ],
-        ),
-        SizedBox(height: 12),
-        Center(
-          child: Card(
-            color: Colors.green[100],
-            child: ListTile(
-              leading: Icon(Icons.directions_bus, color: Colors.blue),
-              title: Text('Public Transport Week'),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  LinearProgressIndicator(
-                      value: 6 / 7, minHeight: 8, color: Colors.green),
-                  SizedBox(height: 4),
-                  Text('6 / 7 days'),
-                ],
-              ),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('30 exp'),
-                  Text('30 points'),
-                ],
-              ),
-            ),
-          ),
+    return GoalQuestsWidget(
+    title: 'Sustainable Quests',
+      onSeeAllPressed: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => MoreSusquest()));
+      },
+      contents: [
+        GoalQuestsCard(
+          icon: Icon(Icons.train_rounded, size: 40),
+          title: 'Public Transport Week',
+          barColor: 0xFF36BB6D,
+          bgColor: 0xFFDCE8D6,
+          progress: '2 / 7',
+          unit: 'days',
+          rewards: ['30 exp', '30 points'],
         ),
       ],
     );
@@ -186,6 +167,14 @@ class MissionTab1 extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(
+          'Leaderboard',
+          style: GoogleFonts.quicksand(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 16),
         _buildTitle(),
         _buildProgressBar(),
         SizedBox(height: 16),
@@ -197,10 +186,9 @@ class MissionTab1 extends StatelessWidget {
   Widget _buildTitle() {
     return Text(
       "Rising Star",
-      style: TextStyle(
-        fontSize: 28,
+      style: GoogleFonts.caveat(
+        fontSize: 45,
         fontWeight: FontWeight.bold,
-        fontStyle: FontStyle.italic,
         height: 0
       ),
     );
@@ -218,12 +206,15 @@ class MissionTab1 extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text("150 exp", style: TextStyle(fontWeight: FontWeight.bold)),
-                  LinearProgressIndicator(
-                    value: 150 / 450,
-                    minHeight: 8,
-                    backgroundColor: Colors.grey[300],
-                    color: Colors.amber,
+                    Text("$exp exp", style: GoogleFonts.quicksand(fontWeight: FontWeight.bold)),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: LinearProgressIndicator(
+                      value: exp / 450,
+                      minHeight: 8,
+                      backgroundColor: Colors.grey[300],
+                      color: Colors.amber,
+                    ),
                   ),
                 ],
               ),
@@ -233,7 +224,7 @@ class MissionTab1 extends StatelessWidget {
           ],
         ),
         SizedBox(height: 4),
-        Text("Get 300 more exp to level up", style: TextStyle(fontSize: 12, color: Colors.black)),
+        Text("Get 300 more exp to level up", style: GoogleFonts.quicksand(fontSize: 12, color: Colors.black)),
       ],
     );
   }
@@ -241,57 +232,39 @@ class MissionTab1 extends StatelessWidget {
   Widget _buildLeaderboardCard() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildToggleButtons(),
-            SizedBox(height: 12),
-            _buildTopPlayerProfile(),
-            Divider(),
-            _buildLeaderboardList(),
-            SizedBox(height: 12),
-            TextButton(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AnimatedToggle(
+            values: ['Region', 'Global'],
+            onToggleCallback: (value) {
+              setState(() {
+                _toggleValue = value;
+              });
+            },
+            buttonColor: const Color(0xFFFFC044),
+            backgroundColor: const Color(0xFFFFF4DF),
+            textColor: const Color(0xFF000000),
+          ),
+          SizedBox(height: 12),
+          Center(child: _buildTopPlayerProfile()),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18.0),
+            child: Divider(),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 21.0),
+            child: _buildLeaderboardList(),
+          ),
+          SizedBox(height: 12),
+          Center(
+            child: TextButton(
               onPressed: () {},
               child: Text("Show All",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  style: GoogleFonts.quicksand(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildToggleButtons() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _buildToggleButton("Regional", isSelected: true),
-          _buildToggleButton("Global", isSelected: false),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildToggleButton(String text, {bool isSelected = false}) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.amber : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Center(
-          child: Text(
-            text,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -304,10 +277,10 @@ class MissionTab1 extends StatelessWidget {
             backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=3')),
         SizedBox(height: 8),
         Text("Jun Wei",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        Text("Eco King", style: TextStyle(color: Colors.grey)),
+            style: GoogleFonts.quicksand(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text("Eco King", style: GoogleFonts.quicksand(color: Colors.black)),
         Text("150000 exp",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: GoogleFonts.quicksand(fontSize: 16, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -340,15 +313,15 @@ class MissionTab1 extends StatelessWidget {
       child: Row(
         children: [
           Text("$rank",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              style: GoogleFonts.quicksand(fontSize: 16, fontWeight: FontWeight.bold)),
           SizedBox(width: 12),
           CircleAvatar(radius: 16, backgroundImage: NetworkImage(avatarUrl)),
-          SizedBox(width: 8),
-          Expanded(child: Text(name, style: TextStyle(fontSize: 16))),
+          SizedBox(width: 15),
+          Expanded(child: Text(name, style: GoogleFonts.quicksand(fontSize: 15, fontWeight: FontWeight.bold))),
           if (isTopRank)
             Icon(Icons.emoji_events, color: Colors.amber, size: 20),
           SizedBox(width: 8),
-          Text("$exp exp", style: TextStyle(fontWeight: FontWeight.bold)),
+          Text("$exp exp", style: GoogleFonts.quicksand(fontWeight: FontWeight.bold)),
         ],
       ),
     );
