@@ -1,7 +1,7 @@
 import 'package:steadypunpipi_vhack/models/expense_item.dart';
 
 class Expense {
-  String transactionName;
+  String? transactionName;
   bool isMultipleItem;
   List<ExpenseItem> items;
   String paymentMethod;

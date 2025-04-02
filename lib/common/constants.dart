@@ -9,13 +9,14 @@ class AppConstants {
   static const String baseUrl = "https://api.yourserver.com";
   static const String transactionsEndpoint = "$baseUrl/transactions";
   static const String carbonEndpoint = "$baseUrl/carbon";
-
   static const String GEMINI_API_KEY =
       "AIzaSyDvgydDIgm2BnHGmzghqGIQSgzvRitkDkA";
   static const String GOOGLE_VISION_API_KEY =
       "AIzaSyAOKtlOJCS_N38VLCnBZ5LY08BHy2Bc3XA";
   static const String TRANSACTION_GEMINI_API_KEY =
       "AIzaSyByfHg3R3hd4XrxmOoMNaMaKsW0GjuscIc";
+  static const String CARBON_API_KEY =
+      "721186b0961f2f719af49a4f7ba143bd25e532005abaac62c53aad7c9d7f702e6a7b6e725efea40d78f7a0644c77a06a6ee9949a57d28eb174546ce0ad9f4808";
 
   // 🎨 Color Palette (Light Theme)
   static const Color primaryColor = Color(0xFF4CAF50);

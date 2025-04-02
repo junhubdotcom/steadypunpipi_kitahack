@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:steadypunpipi_vhack/models/expense.dart';
 import 'package:steadypunpipi_vhack/models/expense_item.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/scanner.dart';
+import 'package:steadypunpipi_vhack/services/carbon_service.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/Itembutton.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/details_button.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/image_upload.dart';
@@ -35,6 +36,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
 
   String category_dropdown_value = "Food";
 
+  CarbonService carbonService = CarbonService();
   Future pickImage(ImageSource source, bool isReceipt) async {
     try {
       XFile? image = await ImagePicker().pickImage(source: source);
@@ -198,10 +200,10 @@ class _RecordTransactionState extends State<RecordTransaction> {
                                           item.name = value!,
                                       onCategoryChanged: (value) =>
                                           item.category = value!,
-                                      onQuantityChanged: (value) =>
-                                          item.quantity = value! as int,
-                                      onPriceChanged: (value) =>
-                                          item.price = value! as double,
+                                      onQuantityChanged: (value) => item
+                                          .quantity = int.tryParse(value!) ?? 0,
+                                      onPriceChanged: (value) => item.price =
+                                          double.tryParse(value!) ?? 0.0,
                                     );
                                   }),
                                   Row(
@@ -247,11 +249,11 @@ class _RecordTransactionState extends State<RecordTransaction> {
                                     },
                                     onPriceChanged: (value) {
                                       widget.expense.items.first.price =
-                                          value! as double;
+                                          double.tryParse(value!) ?? 0;
                                     },
                                     onQuantityChanged: (value) {
                                       widget.expense.items.first.quantity =
-                                          value! as int;
+                                          int.tryParse(value!) ?? 0;
                                     },
                                   )
                                 ],
@@ -434,7 +436,10 @@ class _RecordTransactionState extends State<RecordTransaction> {
                     textColor: 0xff000000,
                     buttonColor: 0xff74c95c,
                     button_text: "Done",
-                    onPressed: () {}),
+                    onPressed: () async {
+                      Expense updatedExpense =
+                          await carbonService.sendToCarbonApi(widget.expense);
+                    }),
               )
             ],
           ),
