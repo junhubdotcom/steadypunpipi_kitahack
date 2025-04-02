@@ -1,8 +1,8 @@
 class FinanceCO2Data {
-  final String label; // Day, Week, or Month
-  final double income;
-  final double expense;
-  final double co2; // Carbon footprint in kg
+  String label; // Day, Week, or Month
+  double income;
+  double expense;
+  double co2; // Carbon footprint in kg
 
   FinanceCO2Data({
     required this.label,

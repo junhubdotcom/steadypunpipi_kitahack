@@ -10,6 +10,8 @@ import 'package:steadypunpipi_vhack/widgets/transaction_widgets/indicator.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_list.dart';
 
 class TransactionPage extends StatefulWidget {
+  const TransactionPage({super.key});
+
   @override
   State<TransactionPage> createState() => _TransactionPageState();
 }
@@ -176,7 +178,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 ),
                 Expanded(
                   child: Image.asset(
-                    'assets/images/green_tree.png',
+                    'assets/images/girl_tree.png',
                     // fit: BoxFit.cover,
                     width: MediaQuery.sizeOf(context).width * 0.50,
                     height: MediaQuery.sizeOf(context).height * 0.20,
@@ -191,6 +193,10 @@ class _TransactionPageState extends State<TransactionPage> {
               onPressed: () {
                 selectMonth();
               },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0XFFE5ECDD),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8.0)))),
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.30,
                 child: Row(
@@ -212,10 +218,6 @@ class _TransactionPageState extends State<TransactionPage> {
                   ],
                 ),
               ),
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0XFFE5ECDD),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8.0)))),
             ),
             SizedBox(
               height: 15,

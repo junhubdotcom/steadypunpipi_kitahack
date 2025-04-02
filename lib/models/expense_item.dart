@@ -1,11 +1,11 @@
-class TransactionItem {
+class ExpenseItem {
   String name;
   String category;
   int quantity;
   double price;
   double carbon_footprint;
 
-  TransactionItem(
+  ExpenseItem(
       {this.name = '',
       this.category = 'Food',
       this.quantity = 0,
@@ -13,8 +13,8 @@ class TransactionItem {
       this.carbon_footprint = 0.00});
 
   // From JSON
-  factory TransactionItem.fromJson(Map<String, dynamic> json) {
-    return TransactionItem(
+  factory ExpenseItem.fromJson(Map<String, dynamic> json) {
+    return ExpenseItem(
       name: json['name'] ?? '',
       category: json['category'] ?? 'Food',
       quantity: int.tryParse(json['quantity'].toString()) ?? 0,

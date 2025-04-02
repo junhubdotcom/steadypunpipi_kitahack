@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:steadypunpipi_vhack/models/transaction_item.dart';
+import 'package:steadypunpipi_vhack/models/expense_item.dart';
 
 class TransactionTextfield extends StatelessWidget {
   String? value;
   final Function(String?) onChanged;
-  List<TransactionItem> itemModels = [
-    TransactionItem(),
+  List<ExpenseItem> itemModels = [
+    ExpenseItem(),
   ];
 
   TransactionTextfield({this.value, required this.onChanged, super.key});

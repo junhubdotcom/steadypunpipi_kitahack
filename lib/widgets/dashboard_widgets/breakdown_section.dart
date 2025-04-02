@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/models/breakdown_item.dart';
+import 'package:steadypunpipi_vhack/models/transaction_model.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/breakdown_tab.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/expandable_card.dart';
 
 class BreakdownSection extends StatelessWidget {
-  const BreakdownSection({super.key});
+  final List<TransactionModel> transactions;
+
+  const BreakdownSection({super.key, required this.transactions});
 
   @override
   Widget build(BuildContext context) {
     return ExpandableCard(
       title: "Breakdown",
-      subtitle: "Know category bla caption",
+      subtitle: "Understand where it all goes",
       icon: Icons.pie_chart,
       tabs: const [
         Tab(text: "Expense"),
@@ -18,38 +21,71 @@ class BreakdownSection extends StatelessWidget {
         Tab(text: "CO₂"),
       ],
       tabViews: [
-        expenseTab(),
-        incomeTab(),
-        carbonTab(),
+        expenseTab(context, transactions),
+        incomeTab(context, transactions),
+        carbonTab(context, transactions),
       ],
     );
   }
 }
 
-Widget expenseTab() {
+Widget expenseTab(BuildContext context, List<TransactionModel> transactions) {
   return buildBreakdownTab(
+    context: context,
     title: "Expense",
-    data: fetchExpenses(),
+    data: processTransactions(transactions, "expense"),
     unit: "RM",
-    valueColor: Colors.red, 
+    valueColor: Colors.red,
+    type: "Expense",
   );
 }
 
-Widget incomeTab() {
+Widget incomeTab(BuildContext context, List<TransactionModel> transactions) {
   return buildBreakdownTab(
+    context: context,
     title: "Income",
-    data: fetchIncome(),
+    data: processTransactions(transactions, "income"),
     unit: "RM",
-    valueColor: Colors.green, 
+    valueColor: const Color.fromRGBO(76, 175, 80, 1),
+    type: "Income",
   );
 }
 
-Widget carbonTab() {
+Widget carbonTab(BuildContext context, List<TransactionModel> transactions) {
   return buildBreakdownTab(
+    context: context,
     title: "CO₂ Emissions",
-    data: fetchCO2(),
+    data: processCO2(transactions),
     unit: "kg CO₂",
-    valueColor: Colors.blueGrey, 
+    valueColor: Colors.blueGrey,
+    type: "CO2",
   );
 }
 
+/// **Process transactions based on type (expense/income)**
+List<BreakdownItem> processTransactions(List<TransactionModel> transactions, String type) {
+  Map<String, double> categoryTotals = {};
+
+  for (var transaction in transactions) {
+    if (transaction.type == type) {
+      categoryTotals[transaction.category] =
+          (categoryTotals[transaction.category] ?? 0) + transaction.amount;
+    }
+  }
+
+  return categoryTotals.entries.map((e) => BreakdownItem(category: e.key, value: e.value)).toList();
+}
+
+/// **Process CO₂ emissions from transactions**
+List<BreakdownItem> processCO2(List<TransactionModel> transactions) {
+  Map<String, double> categoryCO2 = {};
+
+  for (var transaction in transactions) {
+    if (transaction.carbonFootprint != null) {
+      categoryCO2[transaction.category] =
+          (categoryCO2[transaction.category] ?? 0) + transaction.carbonFootprint!;
+    }
+  }
+
+  return categoryCO2.entries.map((e) => BreakdownItem(category: e.key, value: e.value)).toList();
+}
