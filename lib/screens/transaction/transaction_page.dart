@@ -178,7 +178,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 ),
                 Expanded(
                   child: Image.asset(
-                    'assets/images/green_tree.png',
+                    'assets/images/girl_tree.png',
                     // fit: BoxFit.cover,
                     width: MediaQuery.sizeOf(context).width * 0.50,
                     height: MediaQuery.sizeOf(context).height * 0.20,
