@@ -13,6 +13,24 @@ class _PetPageState extends State<PetPage> {
   // State to track which widget to display
   int currentState = 1; // 1: WardrobePet, 2: ChatPet, 3: CalendarPet
 
+  // State to track selected items
+  String? _selectedHat;
+  String? _selectedShirt;
+
+  void _updateHatSelection(String imageUrl) {
+    setState(() {
+      _selectedHat = imageUrl;
+      print("Selected Hat: $_selectedHat");
+    });
+  }
+
+  void _updateShirtSelection(String imageUrl) {
+    setState(() {
+      _selectedShirt = imageUrl;
+      print("Selected Shirt: $_selectedShirt");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,6 +65,22 @@ class _PetPageState extends State<PetPage> {
                               fit: BoxFit.cover,
                             ),
                           ),
+                          // Enabled when selected
+                          if (_selectedHat == 'assets/images/hats/hat1.png')  
+                            Positioned.fill(
+                              child: Image.asset(
+                                'assets/images/hats/hatwear1.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          // Enabled when selected
+                          if (_selectedShirt == 'assets/images/shirts/shirt1.png')
+                            Positioned.fill(
+                              child: Image.asset(
+                                'assets/images/shirts/shirtwear1.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -87,7 +121,7 @@ class _PetPageState extends State<PetPage> {
                                 icon: Icons.event_note_outlined,
                                 onPressed: () {
                                   setState(() {
-                                    currentState = 3; // Show WardrobePet
+                                    currentState = 3; // Show CalendarPet
                                   });
                                 },
                               ),
@@ -118,7 +152,10 @@ class _PetPageState extends State<PetPage> {
       case 1:
         return ChatPet();
       case 2:
-        return WardrobePet();
+        return WardrobePet(
+          onHatSelected: _updateHatSelection,
+          onShirtSelected: _updateShirtSelection,
+        );
       case 3:
         return CalendarPet();
       default:
