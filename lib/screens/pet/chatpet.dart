@@ -16,8 +16,20 @@ class _ChatPetState extends State<ChatPet> {
   final Gemini gemini = Gemini.instance;
   final ChatUser currentUser = ChatUser(id: "0", firstName: "Me");
   final ChatUser geminiUser = ChatUser(
-      id: "1", firstName: "Gemini", profileImage: "assets/images/temppet.png");
+      id: "1", firstName: "Mew", profileImage: "assets/images/cats/cat1.png");
   List<ChatMessage> messages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    messages = [
+      ChatMessage(
+        text: "Hello, how can I help you?",
+        user: geminiUser,
+        createdAt: DateTime.now(),
+      ),
+    ];
+  }
 
   void _sendMessage(ChatMessage chatMessage) {
     setState(() {
