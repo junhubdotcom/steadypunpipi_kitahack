@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/widgets/pet_widget/row_category.dart';
 
 class WardrobePet extends StatefulWidget {
-  const WardrobePet({super.key});
+  final Function(String) onHatSelected;
+  final Function(String) onShirtSelected;
+
+  const WardrobePet({super.key, required this.onHatSelected, required this.onShirtSelected});
 
   @override
   State<WardrobePet> createState() => _WardrobePetState();
@@ -53,14 +56,14 @@ class _WardrobePetState extends State<WardrobePet>
     },
     {
       'imageUrl': "assets/images/shirts/shirt3.png",
-      'isUnlock': true,
+      'isUnlock': false,
     },
   ];
 
   final List<Map<String, dynamic>> shirtItems2 = [
     {
       'imageUrl': "assets/images/shirts/shirt4.png",
-      'isUnlock': true,
+      'isUnlock': false,
     },
     {
       'imageUrl': "assets/images/shirts/shirt5.png",
@@ -68,7 +71,7 @@ class _WardrobePetState extends State<WardrobePet>
     },
     {
       'imageUrl': "assets/images/shirts/shirt3.png",
-      'isUnlock': true,
+      'isUnlock': false,
     },
   ];
 
@@ -90,7 +93,7 @@ class _WardrobePetState extends State<WardrobePet>
   final List<Map<String, dynamic>> hatItems2 = [
     {
       'imageUrl': "assets/images/hats/hat3.png",
-      'isUnlock': true,
+      'isUnlock': false,
     },
     {
       'imageUrl': "assets/images/hats/hat4.png",
@@ -165,25 +168,29 @@ class _WardrobePetState extends State<WardrobePet>
                 row1Name: "Hots",
                 row2Name: "New",
                 row1: backgroundItems1,
-                row2: backgroundItems2),
+                row2: backgroundItems2,
+                onItemSelected: widget.onHatSelected),
             TabPage(
                 title: "Shirts",
                 row1Name: "Hots",
                 row2Name: "New",
                 row1: shirtItems1,
-                row2: shirtItems2),
+                row2: shirtItems2,
+                onItemSelected: widget.onShirtSelected),
             TabPage(
                 title: "Hats",
                 row1Name: "Hots",
                 row2Name: "New",
                 row1: hatItems1,
-                row2: hatItems2),
+                row2: hatItems2,
+                onItemSelected: widget.onHatSelected),
             TabPage(
                 title: "Pets",
                 row1Name: "Hots",
                 row2Name: "New",
                 row1: catItems1,
-                row2: catItems2),
+                row2: catItems2,
+                onItemSelected: widget.onHatSelected),
           ]),
         ),
       ],
@@ -205,6 +212,7 @@ class TabPage extends StatelessWidget {
     required this.row2Name,
     required this.row1,
     required this.row2,
+    required this.onItemSelected,
   });
 
   final String title;
@@ -212,6 +220,7 @@ class TabPage extends StatelessWidget {
   final String row2Name;
   final List<Map<String, dynamic>> row1;
   final List<Map<String, dynamic>> row2;
+  final Function(String) onItemSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -224,8 +233,16 @@ class TabPage extends StatelessWidget {
             child: Text(title,
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           ),
-          RowCategory(rowTitle: row1Name, items: row1),
-          RowCategory(rowTitle: row2Name, items: row2),
+          RowCategory(
+            rowTitle: row1Name,
+            items: row1,
+            onItemSelected: onItemSelected,
+          ),
+          RowCategory(
+            rowTitle: row2Name,
+            items: row2,
+            onItemSelected: onItemSelected,
+          ),
         ],
       ),
     );

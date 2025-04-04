@@ -59,6 +59,7 @@ class _CalendarPetState extends State<CalendarPet> {
 
       _selectedEvents.value = _getEventsForDay(selectedDay);
     }
+    print("this is selected event: ${_selectedEvents}");
   }
 
   void _onRangeSelected(DateTime? start, DateTime? end, DateTime focusedDay) {
