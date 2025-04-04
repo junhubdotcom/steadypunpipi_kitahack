@@ -27,7 +27,7 @@ class _DashboardPageState extends State<DashboardPage> {
   List<TransactionModel> transactions = [];
   List<FinanceCO2Data> trendData = [];
   Map<String, dynamic> geminiData = {
-    "insights": [],
+    "insights": "",
     "financeTips": [],
     "environmentTips": [],
   };

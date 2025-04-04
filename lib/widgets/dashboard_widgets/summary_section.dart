@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:steadypunpipi_vhack/common/constants.dart';
 import 'package:steadypunpipi_vhack/models/transaction_model.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/expandable_card.dart';
 
@@ -12,6 +11,8 @@ class SummarySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SummaryData summaryData = SummaryData(transactions: transactions);
+
     return ExpandableCard(
       title: "Summary",
       subtitle: "A big picture",
@@ -20,14 +21,63 @@ class SummarySection extends StatelessWidget {
         Tab(text: "Overall"),
       ],
       tabViews: [
-        SingleChildScrollView(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // _buildSummary(),
-              ListView(
-                  children: insights
-                      .map((insight) => ListTile(title: Text(insight)))
-                      .toList()),
+              // Insights
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.lightbulb, color: Colors.amber),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        insights.join(),
+                        style: GoogleFonts.quicksand(
+                            fontSize: 14, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Grid
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children: [
+                  _summaryTile(
+                      "Income",
+                      "RM ${summaryData.totalIncome.toStringAsFixed(2)}",
+                      Colors.green,
+                      Icons.arrow_downward),
+                  _summaryTile(
+                      "Expense",
+                      "RM ${summaryData.totalExpense.toStringAsFixed(2)}",
+                      Colors.red,
+                      Icons.arrow_upward),
+                  _summaryTile(
+                      "Balance",
+                      "RM ${(summaryData.totalIncome - summaryData.totalExpense).toStringAsFixed(2)}",
+                      Colors.indigo,
+                      Icons.account_balance_wallet),
+                  _summaryTile(
+                      "CO₂",
+                      "${summaryData.totalCO2.toStringAsFixed(1)} kg",
+                      Colors.blue,
+                      Icons.eco),
+                ],
+              ),
             ],
           ),
         ),
@@ -35,134 +85,64 @@ class SummarySection extends StatelessWidget {
     );
   }
 
-//   Widget _buildSummary() {
-//     double totalIncome = transactions
-//         .where((tx) => tx.amount > 0)
-//         .fold(0.0, (sum, tx) => sum + tx.amount);
+  Widget _summaryTile(String title, String value, Color color, IconData icon) {
+    return Container(
+      width: 120,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 28, color: color),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: GoogleFonts.quicksand(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: GoogleFonts.quicksand(
+              fontSize: 13,
+              color: Colors.grey.shade800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-//     double totalExpense = transactions
-//         .where((tx) => tx.amount < 0)
-//         .fold(0.0, (sum, tx) => sum + tx.amount.abs());
+class SummaryData {
+  final List<TransactionModel> transactions;
 
-//     double totalCO2 =
-//         transactions.fold(0.0, (sum, tx) => sum + (tx.carbonFootprint ?? 0.0));
+  SummaryData({required this.transactions});
 
-//     return Column(
-//       children: [
-//         Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//           children: [
-//             _buildCircularSummary("CO₂", "${totalCO2.toStringAsFixed(1)} kg"),
-//             _buildCircularSummary("Balance",
-//                 "RM ${(totalIncome - totalExpense).toStringAsFixed(2)}"),
-//             _buildCircularSummary(
-//                 "Income", "RM ${totalIncome.toStringAsFixed(2)}"),
-//             _buildCircularSummary(
-//                 "Expense", "RM ${totalExpense.toStringAsFixed(2)}"),
-//           ],
-//         ),
-//         SizedBox(height: AppConstants.paddingMedium),
-//       ],
-//     );
-//   }
+  double get totalIncome {
+    return transactions
+        .where((tx) => tx.amount > 0)
+        .fold(0.0, (sum, tx) => sum + tx.amount);
+  }
 
-//   Widget _buildCircularSummary(String title, String value) {
-//     return Column(
-//       children: [
-//         Container(
-//           width: 85,
-//           height: 85,
-//           decoration: BoxDecoration(
-//             shape: BoxShape.circle,
-//             gradient: LinearGradient(
-//               colors: [Colors.green.shade400, Colors.green.shade800],
-//               begin: Alignment.topCenter,
-//               end: Alignment.bottomCenter,
-//             ),
-//             boxShadow: [
-//               BoxShadow(
-//                 color: Colors.black26,
-//                 blurRadius: 6,
-//                 offset: Offset(2, 4),
-//               ),
-//             ],
-//           ),
-//           child: Center(
-//             child: Text(
-//               value,
-//               style: GoogleFonts.quicksand(
-//                 fontSize: 16,
-//                 fontWeight: FontWeight.bold,
-//                 color: Colors.white,
-//               ),
-//             ),
-//           ),
-//         ),
-//         SizedBox(height: 8.0),
-//         Text(
-//           title,
-//           style: GoogleFonts.quicksand(
-//             fontWeight: FontWeight.w600,
-//             fontSize: 14,
-//           ),
-//         ),
-//       ],
-//     );
-//   }
+  double get totalExpense {
+    return transactions
+        .where((tx) => tx.amount < 0)
+        .fold(0.0, (sum, tx) => sum + tx.amount.abs());
+  }
 
-//   Widget _buildGradientCard(
-//       {required String title,
-//       required String content,
-//       required IconData icon}) {
-//     return Container(
-//       width: double.infinity,
-//       margin: EdgeInsets.symmetric(vertical: 8),
-//       padding: EdgeInsets.all(16),
-//       decoration: BoxDecoration(
-//         gradient: LinearGradient(
-//           colors: [Colors.blue.shade400, Colors.blue.shade800],
-//           begin: Alignment.topLeft,
-//           end: Alignment.bottomRight,
-//         ),
-//         borderRadius: BorderRadius.circular(12),
-//         boxShadow: [
-//           BoxShadow(
-//             color: Colors.black26,
-//             blurRadius: 8,
-//             offset: Offset(3, 5),
-//           ),
-//         ],
-//       ),
-//       child: Row(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Icon(icon, color: Colors.white, size: 32),
-//           SizedBox(width: 12),
-//           Expanded(
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   title,
-//                   style: GoogleFonts.quicksand(
-//                     fontSize: 18,
-//                     fontWeight: FontWeight.bold,
-//                     color: Colors.white,
-//                   ),
-//                 ),
-//                 SizedBox(height: 4),
-//                 Text(
-//                   content,
-//                   style: GoogleFonts.quicksand(
-//                     fontSize: 14,
-//                     color: Colors.white.withOpacity(0.9),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
+  double get totalCO2 {
+    return transactions.fold(
+        0.0, (sum, tx) => sum + (tx.carbonFootprint ?? 0.0));
+  }
+
+  double get balance {
+    return totalIncome - totalExpense;
+  }
 }

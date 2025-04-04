@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/circularButton.dart';
+import 'package:steadypunpipi_vhack/widgets/pet_widget/circularButton.dart';
 import 'chatpet.dart';
 import 'package:steadypunpipi_vhack/screens/pet/wardrobe.dart';
 import 'package:steadypunpipi_vhack/screens/pet/calendar.dart';

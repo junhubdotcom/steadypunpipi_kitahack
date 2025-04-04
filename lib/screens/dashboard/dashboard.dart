@@ -27,9 +27,9 @@ class _DashboardPageState extends State<DashboardPage> {
   List<TransactionModel> transactions = [];
   List<FinanceCO2Data> trendData = [];
   Map<String, dynamic> geminiData = {
-    "insights": [],
-    "financeTips": [],
-    "environmentTips": [],
+    "insights": [""],
+    "financeTips": [""],
+    "environmentTips": [""],
   };
 
   bool isLoadingAI = false;
@@ -42,7 +42,11 @@ class _DashboardPageState extends State<DashboardPage> {
     "Tips": true,
   };
 
-  DateTime _selectedDate = DateTime.now();
+  DateTime _selectedDate = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
 
   @override
   void initState() {
@@ -106,6 +110,13 @@ class _DashboardPageState extends State<DashboardPage> {
       });
     } catch (e) {
       print("🚨 Failed to fetch AI insights: $e");
+      setState(() {
+        geminiData = {
+          "insights": ["Unable to fetch insights"],
+          "financeTips": ["Unable to fetch tips"],
+          "environmentTips": ["Unable to fetch tips"],
+        };
+      });
     } finally {
       setState(() {
         isLoadingAI = false;
@@ -161,7 +172,11 @@ class _DashboardPageState extends State<DashboardPage> {
               },
             ),
             if (sectionVisibility["Summary"] ?? false)
-              SummarySection(insights: geminiData["insights"], transactions: transactions),
+              isLoadingAI
+                  ? loadingSummary()
+                  : SummarySection(
+                      insights: geminiData["insights"],
+                      transactions: transactions),
             if (sectionVisibility["Breakdown"] ?? false)
               BreakdownSection(transactions: transactions),
             if (sectionVisibility["Trend"] ?? false)
@@ -172,7 +187,6 @@ class _DashboardPageState extends State<DashboardPage> {
                   : TipsSection(
                       financeTips: geminiData["financeTips"],
                       environmentTips: geminiData["environmentTips"])
-            // InsightsSection(insights: isLoadingAI ? ["Fetching AI insights..."] : geminiData["insights"]),
           ],
         ),
       ),
@@ -196,6 +210,4 @@ class _DashboardPageState extends State<DashboardPage> {
       },
     );
   }
-
-  
 }

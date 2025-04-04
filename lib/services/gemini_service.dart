@@ -1,33 +1,43 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:steadypunpipi_vhack/common/constants.dart';
 
 class GeminiService {
+  // final String _apiKey = AppConstants.GEMINI_API_KEY;
   final String _apiKey = "AIzaSyCIWb3At_0Q-QyZccNX0zlujY8KVCYc2ns";
   final String _endpoint =
-      "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent"; // Updated API version
+      "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent"; 
 
   // Generate AI Insights & Tips
   Future<Map<String, dynamic>> generateInsightsAndTips(
       List<Map<String, dynamic>> transactions, String dateRange) async {
     final prompt = '''
-      Analyze the following transactions from $dateRange.
-      Identify spending trends, categorize expenses, and provide insights into the user's financial habits.
-      
-      Also, based on the transactions, provide at least 2 financial tips and 2 environmental tips to reduce carbon footprint. If you have relevant tips can provide more than 2. Each tip should be **concise (max 20 words)** and **easy to understand**. 
-      
-      Transactions:
-      ${jsonEncode(transactions)}
+        Analyze the transactions within the provided date range. Identify significant spending trends, categorize expenses, and provide insights into the user's financial behaviors and habits. Additionally, based on the transaction data, provide at least two concise financial tips and two environmental tips aimed at reducing the user's carbon footprint. If applicable, you may provide more than two tips.
+        
+        The transaction currency is in RM. The unit for carbon footprint is kg.
 
-      Please return the response in this structured JSON format:
-      {
-        "insights": ["...", "...", "..."],
-        "financeTips": ["...", "...", "..."],
-        "environmentTips": ["...", "...", "..."]
-      }
+        Ensure the insights is a short narrative paragraph that user can quickly know what is happening in summary section of the dashboard
 
-      no markdown
-    ''';
+        Ensure the financial tips are based on spending behavior, and the environmental tips should be informed by the carbon footprint data tied to each transaction.
 
+        Each tip should be concise (max 20 words) and easily actionable.
+
+        If no transactions are provided, return default suggestions or insights indicating the lack of data.
+
+        Date Range: $dateRange 
+        Transactions: ${jsonEncode(transactions)}
+
+        Please return the response in the following structured JSON format without any markdown:
+
+        {
+          "insights": [""],
+          "financeTips": ["...", "...", "..."],
+          "environmentTips": ["...", "...", "..."]
+        }
+
+            ''';
+
+    print("❤️PROMPT❤️: $prompt");
     try {
       final response = await http.post(
         Uri.parse("$_endpoint?key=$_apiKey"),
