@@ -16,7 +16,7 @@ class AppConstants {
   static const String TRANSACTION_GEMINI_API_KEY =
       "AIzaSyByfHg3R3hd4XrxmOoMNaMaKsW0GjuscIc";
   static const String CARBON_API_KEY =
-      "721186b0961f2f719af49a4f7ba143bd25e532005abaac62c53aad7c9d7f702e6a7b6e725efea40d78f7a0644c77a06a6ee9949a57d28eb174546ce0ad9f4808";
+      "87a834b021e3a52ef7a31d63824f2cc7250b53c8ad608500c985d710e116290bb2f615a0f0316b5a76a1786e786735e31890c22dc569dff8efdc39ff873c615f";
 
   // 🎨 Color Palette (Light Theme)
   static const Color primaryColor = Color(0xFF4CAF50);

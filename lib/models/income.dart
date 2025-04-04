@@ -3,7 +3,7 @@ class Income {
   String category;
   double amount;
   String paymentMethod;
-  DateTime time;
+  DateTime dateTime;
   String? location; // Optional
   String? proofOfIncome; // Optional
 
@@ -11,11 +11,11 @@ class Income {
     this.name = '',
     this.category = 'Salary',
     this.amount = 0.00,
-    this.paymentMethod = 'Bank Transfer', // Default method
+    this.paymentMethod = 'Cash', // Default method
     DateTime? time, // Allow null and set default
     this.location,
     this.proofOfIncome,
-  }) : time = time ?? DateTime.now(); // Default to now
+  }) : dateTime = time ?? DateTime.now(); // Default to now
 
   // Convert Income object to JSON
   Map<String, dynamic> toJson() {
@@ -24,7 +24,7 @@ class Income {
       'category': category,
       'amount': amount,
       'paymentMethod': paymentMethod,
-      'time': time.toIso8601String(), // Convert DateTime to string
+      'time': dateTime.toIso8601String(), // Convert DateTime to string
       'location': location,
       'proofOfIncome': proofOfIncome,
     };
