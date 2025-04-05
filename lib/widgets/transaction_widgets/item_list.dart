@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:steadypunpipi_vhack/models/transaction_item.dart';
+import 'package:steadypunpipi_vhack/models/expense_item.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/record_transaction_dropdown.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_textfield.dart';
 
 class ItemList extends StatefulWidget {
-  final TransactionItem item;
+  final ExpenseItem item;
   final Function(String?) onNameChanged;
   final Function(String?) onPriceChanged;
   final Function(String?) onQuantityChanged;

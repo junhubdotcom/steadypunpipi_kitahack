@@ -4,9 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:steadypunpipi_vhack/models/transaction.dart';
-import 'package:steadypunpipi_vhack/models/transaction_item.dart';
+import 'package:steadypunpipi_vhack/models/expense.dart';
+import 'package:steadypunpipi_vhack/models/expense_item.dart';
+import 'package:steadypunpipi_vhack/models/income.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/scanner.dart';
+import 'package:steadypunpipi_vhack/screens/transaction/transaction_details.dart';
+import 'package:steadypunpipi_vhack/services/carbon_service.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/Itembutton.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/details_button.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/image_upload.dart';
@@ -14,62 +17,74 @@ import 'package:steadypunpipi_vhack/widgets/transaction_widgets/item_list.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/record_transaction_dropdown.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/item_header.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/small_title.dart';
+import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_button.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_textfield.dart';
 
 class RecordTransaction extends StatefulWidget {
-  final Transaction transaction;
-
-  RecordTransaction({Transaction? transaction, super.key})
-      : transaction = transaction ?? Transaction();
+  Expense? expense;
+  RecordTransaction({this.expense, super.key});
 
   @override
   State<RecordTransaction> createState() => _RecordTransactionState();
 }
 
 class _RecordTransactionState extends State<RecordTransaction> {
-  String? receipt;
-  String? thing_image;
+  late bool isExpense;
+  late bool isMultipleItem;
+
+  // can be expense and also income, depends on the button that user clicked
+  late dynamic transaction;
+
+  // String? receipt;
+  // String? thing_image;
+  // String? proofOfIncome;
 
   String category_dropdown_value = "Food";
 
-  // List<String?> uploadedImages = List.generate(2, (_) => null);
-
-  void receiptOnTap() {
-    pickImageFromGallery(ImageSource.gallery, true);
-    Navigator.pop(context);
+  @override
+  void initState() {
+    super.initState();
+    isExpense = true;
+    isMultipleItem = false;
+    // transaction = Expense();
+    transaction = isExpense
+        ? widget.expense != null
+            ? widget.expense
+            : Expense()
+        : Income();
   }
 
-  void thingImageOnTap() {
-    pickImageFromGallery(ImageSource.gallery, false);
-    Navigator.pop(context);
-  }
-
-  Future pickImageFromGallery(ImageSource source, bool isReceipt) async {
+  CarbonService carbonService = CarbonService();
+  Future pickImage(ImageSource source, bool isReceipt) async {
     try {
       XFile? image = await ImagePicker().pickImage(source: source);
       if (image == null) return;
 
       setState(() {
-        if (isReceipt) {
-          receipt = image.path;
+        if (isExpense) {
+          if (isReceipt) {
+            // receipt = image.path;
+            transaction.receiptImagePath = image.path;
+          } else {
+            // thing_image = image.path;
+            transaction.additionalImagePath = image.path;
+          }
         } else {
-          thing_image = image.path;
+          // proofOfIncome = image.path;
+          transaction.proofOfIncome = image.path;
         }
       });
     } on PlatformException catch (e) {
       print("Failed to pick image: $e");
     }
+    Navigator.pop(context);
   }
 
   Future pickDateTime() async {
     DateTime? date = await pickDate();
     if (date == null) return;
-    setState(() {
-      widget.transaction.dateTime = date;
-    });
     TimeOfDay? time = await pickTime();
     if (time == null) return;
-
     final newDateTime = DateTime(
       date.year,
       date.month,
@@ -78,13 +93,13 @@ class _RecordTransactionState extends State<RecordTransaction> {
       time.minute,
     );
     setState(() {
-      widget.transaction.dateTime = newDateTime;
+      transaction.dateTime = newDateTime;
     });
   }
 
   Future<DateTime?> pickDate() => showDatePicker(
         context: context,
-        initialDate: widget.transaction.dateTime,
+        initialDate: transaction.dateTime,
         firstDate: DateTime(1900),
         lastDate: DateTime(2100),
       );
@@ -92,15 +107,9 @@ class _RecordTransactionState extends State<RecordTransaction> {
   Future<TimeOfDay?> pickTime() => showTimePicker(
       context: context,
       initialTime: TimeOfDay(
-        hour: widget.transaction.dateTime.hour,
-        minute: widget.transaction.dateTime.minute,
+        hour: transaction.dateTime.hour,
+        minute: transaction.dateTime.minute,
       ));
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,103 +132,200 @@ class _RecordTransactionState extends State<RecordTransaction> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Checkbox(
-                      activeColor: Colors.black,
-                      // contentPadding: EdgeInsets.all(0),
-                      // materialTapTargetSize:
-                      //     MaterialTapTargetSize.shrinkWrap, // shrink tap area
-                      value: widget.transaction.isMultipleItem,
-                      visualDensity: VisualDensity.compact,
-                      onChanged: (bool? newValue) {
-                        setState(() {
-                          widget.transaction.isMultipleItem = newValue ?? false;
-                        });
-                      }),
-                  Text('Multiple Item',
-                      style: GoogleFonts.quicksand(
-                          textStyle: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w600))),
-                ],
+              Padding(
+                padding: const EdgeInsets.only(bottom: 25.0, top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    TransactionButton(
+                        textColor: isExpense ? Colors.white : Colors.black,
+                        backgroundColor:
+                            isExpense ? Colors.grey.shade700 : Colors.white,
+                        borderColor:
+                            isExpense ? Colors.transparent : Colors.black,
+                        buttonText: "Expense",
+                        onPressed: () {
+                          setState(() {
+                            isExpense = true;
+                            transaction = Expense();
+                          });
+                        }),
+                    TransactionButton(
+                        textColor:
+                            isExpense == false ? Colors.white : Colors.black,
+                        backgroundColor: isExpense == false
+                            ? Colors.grey.shade700
+                            : Colors.white,
+                        borderColor: isExpense == false
+                            ? Colors.transparent
+                            : Colors.black,
+                        buttonText: "Income",
+                        onPressed: () {
+                          setState(() {
+                            isExpense = false;
+                            transaction = Income();
+                          });
+                        }),
+                  ],
+                ),
               ),
-              widget.transaction.isMultipleItem
+              isExpense
                   ? Column(
                       children: [
-                        SmallTitle(title: "Transaction Name"),
-                        TransactionTextfield(
-                            value: widget.transaction.transactionName,
-                            onChanged: (value) {
-                              widget.transaction.transactionName = value!;
-                            }),
-                        SmallTitle(title: "Item"),
-                        ItemHeader(),
-                        ...widget.transaction.items
-                            .asMap()
-                            .entries
-                            .map((entry) {
-                          // int index = entry.key;
-                          TransactionItem item = entry.value;
-                          return ItemList(
-                            item: item,
-                            onNameChanged: (value) => item.name = value!,
-                            onCategoryChanged: (value) =>
-                                item.category = value!,
-                            onQuantityChanged: (value) =>
-                                item.quantity = value! as int,
-                            onPriceChanged: (value) =>
-                                item.price = value! as double,
-                          );
-                        }),
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            ItemButton(
-                              onPressed: () {
-                                setState(() {
-                                  widget.transaction.items
-                                      .add(TransactionItem());
-                                });
-                              },
-                              icon: Icons.add,
-                            ),
-                            // SizedBox(
-                            //   width: 2,
-                            // ),
-                            ItemButton(
-                              onPressed: () {
-                                setState(() {
-                                  widget.transaction.items.removeLast();
-                                });
-                              },
-                              icon: Icons.remove,
-                            )
+                            Checkbox(
+                                activeColor: Colors.black,
+                                value: isMultipleItem,
+                                visualDensity: VisualDensity.compact,
+                                onChanged: (bool? newValue) {
+                                  setState(() {
+                                    isMultipleItem = newValue!;
+                                  });
+                                }),
+                            Text('Multiple Item',
+                                style: GoogleFonts.quicksand(
+                                    textStyle: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600))),
                           ],
                         ),
+                        isMultipleItem
+                            ? Column(
+                                children: [
+                                  SmallTitle(title: "Transaction Name"),
+                                  TransactionTextfield(
+                                      value: transaction.transactionName,
+                                      onChanged: (value) {
+                                        transaction.transactionName = value!;
+                                      }),
+                                  SmallTitle(title: "Item"),
+                                  ItemHeader(),
+                                  ...transaction.items
+                                      .asMap()
+                                      .entries
+                                      .map((entry) {
+                                    // int index = entry.key;
+                                    ExpenseItem item = entry.value;
+                                    return ItemList(
+                                      item: item,
+                                      onNameChanged: (value) =>
+                                          item.name = value!,
+                                      onCategoryChanged: (value) =>
+                                          item.category = value!,
+                                      onQuantityChanged: (value) => item
+                                          .quantity = int.tryParse(value!) ?? 0,
+                                      onPriceChanged: (value) => item.price =
+                                          double.tryParse(value!) ?? 0.0,
+                                    );
+                                  }),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      ItemButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            transaction.items
+                                                .add(ExpenseItem());
+                                          });
+                                        },
+                                        icon: Icons.add,
+                                      ),
+                                      ItemButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            transaction.items.removeLast();
+                                          });
+                                        },
+                                        icon: Icons.remove,
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                children: [
+                                  SmallTitle(title: "Item"),
+                                  ItemHeader(),
+                                  ItemList(
+                                    item: transaction.items.first,
+                                    onNameChanged: (value) {
+                                      transaction.items.first.name = value!;
+                                    },
+                                    onCategoryChanged: (value) {
+                                      transaction.items.first.category = value!;
+                                    },
+                                    onPriceChanged: (value) {
+                                      transaction.items.first.price =
+                                          double.tryParse(value!) ?? 0;
+                                    },
+                                    onQuantityChanged: (value) {
+                                      transaction.items.first.quantity =
+                                          int.tryParse(value!) ?? 0;
+                                    },
+                                  )
+                                ],
+                              ),
                       ],
                     )
-                  : Column(
+                  : // Column for the income item
+                  Column(
                       children: [
-                        SmallTitle(title: "Item"),
-                        ItemHeader(),
-                        ItemList(
-                          item: widget.transaction.items.first,
-                          onNameChanged: (value) {
-                            widget.transaction.items.first.name = value!;
-                          },
-                          onCategoryChanged: (value) {
-                            widget.transaction.items.first.category = value!;
-                          },
-                          onPriceChanged: (value) {
-                            widget.transaction.items.first.price =
-                                value! as double;
-                          },
-                          onQuantityChanged: (value) {
-                            widget.transaction.items.first.quantity =
-                                value! as int;
-                          },
-                        )
+                        SmallTitle(title: "Income"),
+                        Row(
+                          children: [
+                            Expanded(flex: 2, child: Text('Name')),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Expanded(flex: 2, child: Text('Category')),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Expanded(flex: 2, child: Text('Amount')),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 7),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  flex: 2,
+                                  child: TransactionTextfield(
+                                    onChanged: (value) {
+                                      transaction.name = value!;
+                                    },
+                                    value: transaction.name,
+                                  )),
+                              SizedBox(width: 5),
+                              Expanded(
+                                flex: 2,
+                                child: RecordTransactionDropdown(
+                                    value: transaction.category,
+                                    onChanged: (value) {
+                                      transaction.category = value!;
+                                    },
+                                    items: [
+                                      'Salary',
+                                      'Investmemt',
+                                      'Freelance',
+                                      'Scholarship'
+                                    ]),
+                              ),
+                              SizedBox(width: 5),
+                              Expanded(
+                                  flex: 2,
+                                  child: TransactionTextfield(
+                                      onChanged: (value) {
+                                        transaction.amount =
+                                            double.tryParse(value!) ?? 0;
+                                      },
+                                      value: transaction.amount.toString())),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
 
@@ -228,9 +334,8 @@ class _RecordTransactionState extends State<RecordTransaction> {
               ),
               SmallTitle(title: 'Payment Method'),
               RecordTransactionDropdown(
-                  value: widget.transaction.paymentMethod,
-                  onChanged: (value) =>
-                      widget.transaction.paymentMethod = value!,
+                  value: transaction.paymentMethod,
+                  onChanged: (value) => transaction.paymentMethod = value!,
                   items: [
                     'Cash',
                     'E-Wallet',
@@ -254,7 +359,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
                   },
                   child: Text(
                       DateFormat('dd MMMM yyyy HH:mm')
-                          .format(widget.transaction.dateTime),
+                          .format(transaction.dateTime),
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w400,
@@ -263,9 +368,9 @@ class _RecordTransactionState extends State<RecordTransaction> {
               ),
               SmallTitle(title: 'Location'),
               TransactionTextfield(
-                  value: widget.transaction.location,
-                  onChanged: (value) => widget.transaction.location),
-              SmallTitle(title: 'Receipt'),
+                  value: transaction.location,
+                  onChanged: (value) => transaction.location = value),
+              SmallTitle(title: isExpense ? 'Receipt' : "Proof of Income"),
               ImageUpload(
                 listTiles: [
                   ListTile(
@@ -275,51 +380,72 @@ class _RecordTransactionState extends State<RecordTransaction> {
                     title: Text(
                       'Add from Gallery',
                     ),
-                    onTap: receiptOnTap,
-                  ),
-                  ListTile(
-                      leading: Icon(
-                        Icons.camera_alt,
-                      ),
-                      title: Text(
-                        'Take Photo',
-                      ),
-                      onTap: receiptOnTap),
-                  ListTile(
-                    leading: Icon(Icons.document_scanner_sharp),
-                    title: Text('Scan Receipt'),
                     onTap: () {
-                      Navigator.push(context,
-                          (MaterialPageRoute(builder: (context) => Scanner())));
+                      pickImage(ImageSource.gallery, true);
                     },
                   ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.camera_alt,
+                    ),
+                    title: Text(
+                      'Take Photo',
+                    ),
+                    onTap: () {
+                      pickImage(ImageSource.camera, true);
+                    },
+                  ),
+                  isExpense
+                      ? ListTile(
+                          leading: Icon(Icons.document_scanner_sharp),
+                          title: Text('Scan Receipt'),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                (MaterialPageRoute(
+                                    builder: (context) => Scanner())));
+                          },
+                        )
+                      : SizedBox()
                 ],
-                imgPath: widget.transaction.receiptImagePath != ""
-                    ? widget.transaction.receiptImagePath
-                    : receipt,
+                imgPath: isExpense
+                    ? transaction.receiptImagePath
+                    : transaction.proofOfIncome,
               ),
               //Image
-              SmallTitle(title: 'Image'),
-              ImageUpload(listTiles: [
-                ListTile(
-                  leading: Icon(
-                    Icons.add,
-                  ),
-                  title: Text(
-                    'Add from Gallery',
-                  ),
-                  onTap: thingImageOnTap,
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.camera_alt,
-                  ),
-                  title: Text(
-                    'Take Photo',
-                  ),
-                  onTap: thingImageOnTap,
-                ),
-              ], imgPath: thing_image),
+              isExpense
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SmallTitle(title: 'Image'),
+                        ImageUpload(listTiles: [
+                          ListTile(
+                            leading: Icon(
+                              Icons.add,
+                            ),
+                            title: Text(
+                              'Add from Gallery',
+                            ),
+                            onTap: () {
+                              pickImage(ImageSource.gallery, false);
+                            },
+                          ),
+                          ListTile(
+                            leading: Icon(
+                              Icons.camera_alt,
+                            ),
+                            title: Text(
+                              'Take Photo',
+                            ),
+                            onTap: () {
+                              pickImage(ImageSource.camera, false);
+                            },
+                          ),
+                        ], imgPath: transaction.additionalImagePath),
+                      ],
+                    )
+                  : SizedBox(),
+
               SizedBox(
                 height: 30,
               ),
@@ -329,7 +455,18 @@ class _RecordTransactionState extends State<RecordTransaction> {
                     textColor: 0xff000000,
                     buttonColor: 0xff74c95c,
                     button_text: "Done",
-                    onPressed: () {}),
+                    onPressed: () async {
+                      if (isExpense) {
+                        await carbonService.generateCarbonApiJson(transaction);
+                      }
+                      print(transaction);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TransactionDetails(
+                                  transaction: transaction,
+                                  isExpense: isExpense)));
+                    }),
               )
             ],
           ),

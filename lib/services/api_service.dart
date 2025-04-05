@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:steadypunpipi_vhack/common/constants.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:steadypunpipi_vhack/models/transaction.dart';
+import 'package:steadypunpipi_vhack/models/expense.dart';
 
 class ApiService {
   final _model = GenerativeModel(
       model: 'gemini-1.5-pro', apiKey: AppConstants.TRANSACTION_GEMINI_API_KEY);
 
-  Future<Transaction> generateContent(String imgPath) async {
+  Future<Expense> generateContent(String imgPath) async {
     try {
       // final image = File(imgPath);
       // final bytes = await image.readAsBytes();
@@ -82,7 +82,7 @@ Inputs:
 
       final jsonResponse = jsonDecode(response.text ?? '{}');
       print(jsonResponse);
-      return Transaction.fromJson(jsonResponse);
+      return Expense.fromJson(jsonResponse);
     } catch (e) {
       throw Exception('Error generating content: $e');
     }

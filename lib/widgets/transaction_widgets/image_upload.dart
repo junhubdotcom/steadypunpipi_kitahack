@@ -36,7 +36,7 @@ class _ImageUploadState extends State<ImageUpload> {
         height: 100,
         decoration: BoxDecoration(
             color: Color(0xffe6e6e6), borderRadius: BorderRadius.circular(10)),
-        child: widget.imgPath != null
+        child: widget.imgPath != null && widget.imgPath!.isNotEmpty
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.file(
