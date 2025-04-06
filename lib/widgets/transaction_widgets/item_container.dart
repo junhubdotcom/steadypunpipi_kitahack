@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:steadypunpipi_vhack/models/expense.dart';
+import 'package:steadypunpipi_vhack/models/expense_item.dart';
+import 'package:steadypunpipi_vhack/models/income.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/label.dart';
 
 class ItemContainer extends StatelessWidget {
-  const ItemContainer({super.key});
+  bool isExpense;
+  dynamic transactionItem;
+  ItemContainer(
+      {required this.isExpense, required this.transactionItem, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,37 +27,42 @@ class ItemContainer extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                'Jacob Biskuit',
+                transactionItem.name,
                 style: GoogleFonts.quicksand(
                     fontWeight: FontWeight.w700, fontSize: 15),
               ),
               Label(),
             ],
           ),
-          Text(
-            '2 x RM 5.00',
-            style: GoogleFonts.quicksand(
-                fontWeight: FontWeight.w600, fontSize: 14),
-          ),
+          isExpense
+              ? Text(
+                  '${transactionItem.quantity} x RM${transactionItem.price.toStringAsFixed(2)}',
+                  style: GoogleFonts.quicksand(
+                      fontWeight: FontWeight.w600, fontSize: 14),
+                )
+              : SizedBox(),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                '-RM10.00',
+                isExpense
+                    ? '-RM${(transactionItem.price * transactionItem.quantity).toStringAsFixed(2)}'
+                    : '+RM${transactionItem.amount.toStringAsFixed(2)}',
                 style: GoogleFonts.quicksand(
                     fontWeight: FontWeight.w600, fontSize: 14),
               ),
-              Text(
-                '+5CO2e',
-                style: GoogleFonts.quicksand(
-                    fontWeight: FontWeight.w600, fontSize: 13),
-              ),
+              isExpense
+                  ? Text(
+                      '+${transactionItem.carbon_footprint.toStringAsFixed(2)}kg CO2e',
+                      style: GoogleFonts.quicksand(
+                          fontWeight: FontWeight.w600, fontSize: 13),
+                    )
+                  : SizedBox(),
             ],
           ),
         ],
       ),
     );
-    ;
   }
 }

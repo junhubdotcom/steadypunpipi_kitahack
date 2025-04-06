@@ -6,7 +6,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:steadypunpipi_vhack/models/expense.dart';
 import 'package:steadypunpipi_vhack/models/expense_item.dart';
+import 'package:steadypunpipi_vhack/models/income.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/scanner.dart';
+import 'package:steadypunpipi_vhack/screens/transaction/transaction_details.dart';
+import 'package:steadypunpipi_vhack/services/carbon_service.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/Itembutton.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/details_button.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/image_upload.dart';
@@ -18,35 +21,57 @@ import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_butt
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_textfield.dart';
 
 class RecordTransaction extends StatefulWidget {
-  final Expense expense;
-
-  RecordTransaction({Expense? expense, super.key})
-      : expense = expense ?? Expense();
+  Expense? expense;
+  RecordTransaction({this.expense, super.key});
 
   @override
   State<RecordTransaction> createState() => _RecordTransactionState();
 }
 
 class _RecordTransactionState extends State<RecordTransaction> {
-  bool isExpense = false;
+  late bool isExpense;
+  late bool isMultipleItem;
 
-  String? receipt;
-  String? thing_image;
+  // can be expense and also income, depends on the button that user clicked
+  late dynamic transaction;
+
+  // String? receipt;
+  // String? thing_image;
+  // String? proofOfIncome;
 
   String category_dropdown_value = "Food";
 
+  @override
+  void initState() {
+    super.initState();
+    isExpense = true;
+    isMultipleItem = false;
+    // transaction = Expense();
+    transaction = isExpense
+        ? widget.expense != null
+            ? widget.expense
+            : Expense()
+        : Income();
+  }
+
+  CarbonService carbonService = CarbonService();
   Future pickImage(ImageSource source, bool isReceipt) async {
     try {
       XFile? image = await ImagePicker().pickImage(source: source);
       if (image == null) return;
 
       setState(() {
-        if (isReceipt) {
-          receipt = image.path;
-          widget.expense.receiptImagePath = receipt;
+        if (isExpense) {
+          if (isReceipt) {
+            // receipt = image.path;
+            transaction.receiptImagePath = image.path;
+          } else {
+            // thing_image = image.path;
+            transaction.additionalImagePath = image.path;
+          }
         } else {
-          thing_image = image.path;
-          widget.expense.additionalImagePath = [thing_image];
+          // proofOfIncome = image.path;
+          transaction.proofOfIncome = image.path;
         }
       });
     } on PlatformException catch (e) {
@@ -58,12 +83,8 @@ class _RecordTransactionState extends State<RecordTransaction> {
   Future pickDateTime() async {
     DateTime? date = await pickDate();
     if (date == null) return;
-    setState(() {
-      widget.expense.dateTime = date;
-    });
     TimeOfDay? time = await pickTime();
     if (time == null) return;
-
     final newDateTime = DateTime(
       date.year,
       date.month,
@@ -72,13 +93,13 @@ class _RecordTransactionState extends State<RecordTransaction> {
       time.minute,
     );
     setState(() {
-      widget.expense.dateTime = newDateTime;
+      transaction.dateTime = newDateTime;
     });
   }
 
   Future<DateTime?> pickDate() => showDatePicker(
         context: context,
-        initialDate: widget.expense.dateTime,
+        initialDate: transaction.dateTime,
         firstDate: DateTime(1900),
         lastDate: DateTime(2100),
       );
@@ -86,15 +107,9 @@ class _RecordTransactionState extends State<RecordTransaction> {
   Future<TimeOfDay?> pickTime() => showTimePicker(
       context: context,
       initialTime: TimeOfDay(
-        hour: widget.expense.dateTime.hour,
-        minute: widget.expense.dateTime.minute,
+        hour: transaction.dateTime.hour,
+        minute: transaction.dateTime.minute,
       ));
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +147,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
                         onPressed: () {
                           setState(() {
                             isExpense = true;
+                            transaction = Expense();
                           });
                         }),
                     TransactionButton(
@@ -147,6 +163,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
                         onPressed: () {
                           setState(() {
                             isExpense = false;
+                            transaction = Income();
                           });
                         }),
                   ],
@@ -160,12 +177,11 @@ class _RecordTransactionState extends State<RecordTransaction> {
                           children: [
                             Checkbox(
                                 activeColor: Colors.black,
-                                value: widget.expense.isMultipleItem,
+                                value: isMultipleItem,
                                 visualDensity: VisualDensity.compact,
                                 onChanged: (bool? newValue) {
                                   setState(() {
-                                    widget.expense.isMultipleItem =
-                                        newValue ?? false;
+                                    isMultipleItem = newValue!;
                                   });
                                 }),
                             Text('Multiple Item',
@@ -175,18 +191,18 @@ class _RecordTransactionState extends State<RecordTransaction> {
                                         fontWeight: FontWeight.w600))),
                           ],
                         ),
-                        widget.expense.isMultipleItem
+                        isMultipleItem
                             ? Column(
                                 children: [
                                   SmallTitle(title: "Transaction Name"),
                                   TransactionTextfield(
-                                      value: widget.expense.transactionName,
+                                      value: transaction.transactionName,
                                       onChanged: (value) {
-                                        widget.expense.transactionName = value!;
+                                        transaction.transactionName = value!;
                                       }),
                                   SmallTitle(title: "Item"),
                                   ItemHeader(),
-                                  ...widget.expense.items
+                                  ...transaction.items
                                       .asMap()
                                       .entries
                                       .map((entry) {
@@ -198,10 +214,10 @@ class _RecordTransactionState extends State<RecordTransaction> {
                                           item.name = value!,
                                       onCategoryChanged: (value) =>
                                           item.category = value!,
-                                      onQuantityChanged: (value) =>
-                                          item.quantity = value! as int,
-                                      onPriceChanged: (value) =>
-                                          item.price = value! as double,
+                                      onQuantityChanged: (value) => item
+                                          .quantity = int.tryParse(value!) ?? 0,
+                                      onPriceChanged: (value) => item.price =
+                                          double.tryParse(value!) ?? 0.0,
                                     );
                                   }),
                                   Row(
@@ -211,19 +227,16 @@ class _RecordTransactionState extends State<RecordTransaction> {
                                       ItemButton(
                                         onPressed: () {
                                           setState(() {
-                                            widget.expense.items
+                                            transaction.items
                                                 .add(ExpenseItem());
                                           });
                                         },
                                         icon: Icons.add,
                                       ),
-                                      // SizedBox(
-                                      //   width: 2,
-                                      // ),
                                       ItemButton(
                                         onPressed: () {
                                           setState(() {
-                                            widget.expense.items.removeLast();
+                                            transaction.items.removeLast();
                                           });
                                         },
                                         icon: Icons.remove,
@@ -237,28 +250,28 @@ class _RecordTransactionState extends State<RecordTransaction> {
                                   SmallTitle(title: "Item"),
                                   ItemHeader(),
                                   ItemList(
-                                    item: widget.expense.items.first,
+                                    item: transaction.items.first,
                                     onNameChanged: (value) {
-                                      widget.expense.items.first.name = value!;
+                                      transaction.items.first.name = value!;
                                     },
                                     onCategoryChanged: (value) {
-                                      widget.expense.items.first.category =
-                                          value!;
+                                      transaction.items.first.category = value!;
                                     },
                                     onPriceChanged: (value) {
-                                      widget.expense.items.first.price =
-                                          value! as double;
+                                      transaction.items.first.price =
+                                          double.tryParse(value!) ?? 0;
                                     },
                                     onQuantityChanged: (value) {
-                                      widget.expense.items.first.quantity =
-                                          value! as int;
+                                      transaction.items.first.quantity =
+                                          int.tryParse(value!) ?? 0;
                                     },
                                   )
                                 ],
                               ),
                       ],
                     )
-                  : Column(
+                  : // Column for the income item
+                  Column(
                       children: [
                         SmallTitle(title: "Income"),
                         Row(
@@ -281,27 +294,35 @@ class _RecordTransactionState extends State<RecordTransaction> {
                               Expanded(
                                   flex: 2,
                                   child: TransactionTextfield(
-                                    onChanged: (value) {},
-                                    value: "blaaa",
+                                    onChanged: (value) {
+                                      transaction.name = value!;
+                                    },
+                                    value: transaction.name,
                                   )),
                               SizedBox(width: 5),
                               Expanded(
                                 flex: 2,
                                 child: RecordTransactionDropdown(
-                                    value: "Salary",
-                                    onChanged: (value) {},
+                                    value: transaction.category,
+                                    onChanged: (value) {
+                                      transaction.category = value!;
+                                    },
                                     items: [
-                                      "Salary",
-                                      "Investmemt",
-                                      "Freelance",
-                                      "Scholarship"
+                                      'Salary',
+                                      'Investmemt',
+                                      'Freelance',
+                                      'Scholarship'
                                     ]),
                               ),
                               SizedBox(width: 5),
                               Expanded(
                                   flex: 2,
                                   child: TransactionTextfield(
-                                      onChanged: (value) {}, value: "")),
+                                      onChanged: (value) {
+                                        transaction.amount =
+                                            double.tryParse(value!) ?? 0;
+                                      },
+                                      value: transaction.amount.toString())),
                             ],
                           ),
                         ),
@@ -313,8 +334,8 @@ class _RecordTransactionState extends State<RecordTransaction> {
               ),
               SmallTitle(title: 'Payment Method'),
               RecordTransactionDropdown(
-                  value: widget.expense.paymentMethod,
-                  onChanged: (value) => widget.expense.paymentMethod = value!,
+                  value: transaction.paymentMethod,
+                  onChanged: (value) => transaction.paymentMethod = value!,
                   items: [
                     'Cash',
                     'E-Wallet',
@@ -338,7 +359,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
                   },
                   child: Text(
                       DateFormat('dd MMMM yyyy HH:mm')
-                          .format(widget.expense.dateTime),
+                          .format(transaction.dateTime),
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w400,
@@ -347,8 +368,8 @@ class _RecordTransactionState extends State<RecordTransaction> {
               ),
               SmallTitle(title: 'Location'),
               TransactionTextfield(
-                  value: widget.expense.location,
-                  onChanged: (value) => widget.expense.location),
+                  value: transaction.location,
+                  onChanged: (value) => transaction.location = value),
               SmallTitle(title: isExpense ? 'Receipt' : "Proof of Income"),
               ImageUpload(
                 listTiles: [
@@ -387,9 +408,9 @@ class _RecordTransactionState extends State<RecordTransaction> {
                         )
                       : SizedBox()
                 ],
-                imgPath: widget.expense.receiptImagePath != ""
-                    ? widget.expense.receiptImagePath
-                    : receipt,
+                imgPath: isExpense
+                    ? transaction.receiptImagePath
+                    : transaction.proofOfIncome,
               ),
               //Image
               isExpense
@@ -420,7 +441,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
                               pickImage(ImageSource.camera, false);
                             },
                           ),
-                        ], imgPath: thing_image),
+                        ], imgPath: transaction.additionalImagePath),
                       ],
                     )
                   : SizedBox(),
@@ -434,7 +455,18 @@ class _RecordTransactionState extends State<RecordTransaction> {
                     textColor: 0xff000000,
                     buttonColor: 0xff74c95c,
                     button_text: "Done",
-                    onPressed: () {}),
+                    onPressed: () async {
+                      if (isExpense) {
+                        await carbonService.generateCarbonApiJson(transaction);
+                      }
+                      print(transaction);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TransactionDetails(
+                                  transaction: transaction,
+                                  isExpense: isExpense)));
+                    }),
               )
             ],
           ),

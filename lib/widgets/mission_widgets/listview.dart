@@ -24,7 +24,9 @@ class ListviewWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading:
-          asset,
+          SizedBox(
+            width: 40,
+            child: asset),
       title: Text(
         title,
         style: GoogleFonts.quicksand(

@@ -2,6 +2,7 @@ C/C++ Structured LogT
 R
 PC:\DevTools\flutter\packages\flutter_tools\gradle\src\main\groovy\CMakeLists.txtC
 A
+<<<<<<< HEAD
 ?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	²¸ÂÚà2§ ÿèùÚ2ˆ
 …
 ‚C:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\additional_project_files.txt	²¸ÂÚà2 Ó†¶Žà2„
@@ -26,3 +27,29 @@ z
 xC:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\prefab_config.json	²¸ÂÚà2( Û†¶Žà2
 
 }C:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\symbol_folder_index.txt	²¸ÂÚà2t Ü†¶Žà2
+=======
+?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	û–ÅÝà2§ ÿèùÚ2ˆ
+…
+‚C:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\additional_project_files.txt	û–ÅÝà2 ®ßðÜà2„
+
+C:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\android_gradle_build.json	û–ÅÝà2ð ²ßðÜà2Š
+‡
+„C:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\android_gradle_build_mini.json	û–ÅÝà2Ë ·ßðÜà2u
+s
+qC:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\build.ninja	û–ÅÝà2³Õ ÷ÝðÜà2y
+w
+uC:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\build.ninja.txt	û–ÅÝà2~
+|
+zC:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\build_file_index.txt	û–ÅÝà2P ¾ßðÜà2
+}
+{C:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\compile_commands.json	û–ÅÝà2	„
+
+C:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\compile_commands.json.bin	û–ÅÝà2
+‹
+ˆ
+…C:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\metadata_generation_command.txt	û–ÅÝà2	 ¹ßðÜà2|
+z
+xC:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\prefab_config.json	û–ÅÝà2( ºßðÜà2
+
+}C:\Users\furno\Desktop\New folder\kitahack\steadypunpipi_kitahack\android\app\.cxx\Debug\1g3y4s72\x86\symbol_folder_index.txt	û–ÅÝà2t ½ßðÜà2
+>>>>>>> main
