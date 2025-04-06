@@ -119,8 +119,8 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                               text: widget.transaction.paymentMethod),
                           Description(
                               icon: Icons.watch_later,
-                              text: DateFormat('dd MMMM yyyy HH:mm')
-                                  .format(widget.transaction.dateTime)),
+                              text: DateFormat('dd MMMM yyyy HH:mm').format(
+                                  widget.transaction.dateTime.toDate())),
                           Description(
                               icon: Icons.place,
                               text: widget.transaction.location.toString()),
@@ -151,7 +151,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                     ImageDisplayWidget(
                         imgPath: widget.isExpense
                             ? widget.transaction.receiptImagePath ?? ""
-                            : widget.transaction.proofOfIncome),
+                            : widget.transaction.proofOfIncome ?? ""),
 
                     // Remove this column when it is income
                     widget.isExpense

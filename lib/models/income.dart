@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Income {
   String name;
   String category;
   double amount;
   String paymentMethod;
-  DateTime dateTime;
+  Timestamp dateTime;
   String? location; // Optional
   String? proofOfIncome; // Optional
 
@@ -12,10 +14,10 @@ class Income {
     this.category = 'Salary',
     this.amount = 0.00,
     this.paymentMethod = 'Cash', // Default method
-    DateTime? time, // Allow null and set default
+    Timestamp? dateTime, // Allow null and set default
     this.location,
     this.proofOfIncome,
-  }) : dateTime = time ?? DateTime.now(); // Default to now
+  }) : dateTime = dateTime ?? Timestamp.now(); // Default to now
 
   // Convert Income object to JSON
   Map<String, dynamic> toJson() {
@@ -24,7 +26,7 @@ class Income {
       'category': category,
       'amount': amount,
       'paymentMethod': paymentMethod,
-      'time': dateTime.toIso8601String(), // Convert DateTime to string
+      'time': dateTime, // Convert DateTime to string
       'location': location,
       'proofOfIncome': proofOfIncome,
     };
@@ -37,7 +39,7 @@ class Income {
       category: json['category'] ?? 'Salary',
       amount: (json['amount'] ?? 0).toDouble(),
       paymentMethod: json['paymentMethod'] ?? 'Bank Transfer',
-      time: DateTime.tryParse(json['time'] ?? '') ?? DateTime.now(),
+      dateTime: json['dateTime'] is Timestamp ? json['dateTime'] as Timestamp : Timestamp.now(),
       location: json['location'],
       proofOfIncome: json['proofOfIncome'],
     );

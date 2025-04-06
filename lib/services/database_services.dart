@@ -1,9 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:steadypunpipi_vhack/models/expensealt.dart';
-import 'package:steadypunpipi_vhack/models/expense_itemalt.dart';
+import 'package:steadypunpipi_vhack/models/expense.dart';
+import 'package:steadypunpipi_vhack/models/expense_item.dart';
+import 'package:steadypunpipi_vhack/models/income.dart';
+// import 'package:steadypunpipi_vhack/models/expensealt.dart';
+// import 'package:steadypunpipi_vhack/models/expense_itemalt.dart';
 
 const String EXPENSE_COLLECTION_REF = "Expense";
+const String INCOME_COLLECTION_REF = "Income";
 const String EXPENSE_ITEM_COLLECTION_REF = "ExpenseItem";
+
 
 class DatabaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -14,6 +19,14 @@ class DatabaseService {
                 snapshots.data()!,
               ),
           toFirestore: (expense, _) => (expense as Expense).toJson());
+  
+
+  CollectionReference<Income> get incomesCollection =>
+    _firestore.collection(INCOME_COLLECTION_REF).withConverter<Income>(
+        fromFirestore: (snapshots, _) => Income.fromJson(
+              snapshots.data()!,
+            ),
+        toFirestore: (income, _) => (income as Income).toJson());
 
   CollectionReference<ExpenseItem> get expenseItemsCollection => _firestore
       .collection(EXPENSE_ITEM_COLLECTION_REF)
@@ -53,6 +66,25 @@ class DatabaseService {
     await expensesCollection.doc(expenseId).delete();
   }
 
+  //Income
+ Future<DocumentReference<Income>> addIncome(Income income) async {
+    return await incomesCollection.add(income);
+  }
+
+  Future<void> updateIncome(String incomeId, Income income) async {
+    await expensesCollection.doc(incomeId).update(income.toJson());
+  }
+
+  Future<Income?> getIncome(String incomeId) async {
+    final snapshot = await incomesCollection.doc(incomeId).get();
+    return snapshot.data();
+  }
+
+  Future<void> deleteIncome(String incomeId) async {
+    await incomesCollection.doc(incomeId).delete();
+  }
+
+  //Expense Item
   Future<DocumentReference<ExpenseItem>> addExpenseItem(
       ExpenseItem expenseItem) async {
     return await expenseItemsCollection.add(expenseItem);
