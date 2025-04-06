@@ -1,11 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/common/constants.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'route.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
-void main() {
-  Gemini.init(apiKey: AppConstants.GEMINI_API_KEY);
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseFirestore.instance.settings =
+      const Settings(persistenceEnabled: true);
+  Gemini.init(apiKey: AppConstants.GEMINI_API_KEY);
   runApp(MyApp());
 }
 

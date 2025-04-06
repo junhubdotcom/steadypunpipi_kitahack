@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:steadypunpipi_vhack/common/userdata.dart';
 
 class MissionTab2 extends StatefulWidget {
   const MissionTab2({super.key});
@@ -9,10 +10,25 @@ class MissionTab2 extends StatefulWidget {
 }
 
 class _MissionTab2State extends State<MissionTab2> {
-  int points = 150;
-  List<bool> rewardBookmarks = [false, false, false, false];
+  final UserData _userData = UserData();
   bool showBookmarkedOnly = false;
   String searchQuery = "";
+  late List<RewardItem> rewards;
+
+  @override
+  void initState() {
+    super.initState();
+    rewards = [
+      RewardItem(0, "10% Google Cloud", "Discount voucher", "1000 points",
+          Image.asset("assets/images/google.png", width: 45, height: 45), Colors.green[100]!),
+      RewardItem(1, "WWF", "Donation", "150 points",
+          Image.asset("assets/images/wwf.png", width: 45, height: 45), Colors.blueGrey[100]!),
+      RewardItem(2, "10% Google Cloud", "Discount voucher", "1000 points",
+          Image.asset("assets/images/google.png", width: 45, height: 45), Colors.green[100]!),
+      RewardItem(3, "WWF", "Donation", "150 points",
+          Image.asset("assets/images/wwf.png", width: 45, height: 45), Colors.blueGrey[100]!),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +60,7 @@ class _MissionTab2State extends State<MissionTab2> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Rising Star",
+              _userData.name,
               style: GoogleFonts.caveat(
                 fontSize: 27,
                 fontWeight: FontWeight.bold,
@@ -52,7 +68,7 @@ class _MissionTab2State extends State<MissionTab2> {
             ),
             SizedBox(height: 9),
             Text("Green points", style: GoogleFonts.quicksand(fontSize: 15, height: 0)),
-            Text("150", style: GoogleFonts.quicksand(fontSize: 18, height: 0)),
+            Text("${_userData.totalPoints}", style: GoogleFonts.quicksand(fontSize: 18, height: 0)),
           ],
         ),
         Image.asset("assets/images/girl_tree.png", width: 192, height: 172),
@@ -102,19 +118,8 @@ class _MissionTab2State extends State<MissionTab2> {
   }
 
   Widget _buildRewardsList() {
-    List<RewardItem> rewards = [
-      RewardItem(0, "10% Google Cloud", "Discount voucher", "1000 points",
-          Image.asset("assets/images/google.png", width: 45, height: 45), Colors.green[100]!),
-      RewardItem(1, "WWF", "Donation", "$points points",
-          Image.asset("assets/images/wwf.png", width: 45, height: 45), Colors.blueGrey[100]!),
-      RewardItem(2, "10% Google Cloud", "Discount voucher", "1000 points",
-          Image.asset("assets/images/google.png", width: 45, height: 45), Colors.green[100]!),
-      RewardItem(3, "WWF", "Donation", "150 points",
-          Image.asset("assets/images/wwf.png", width: 45, height: 45), Colors.blueGrey[100]!),
-    ];
-
     List<RewardItem> filteredRewards = rewards.where((reward) {
-      final matchesBookmark = !showBookmarkedOnly || rewardBookmarks[reward.index];
+      final matchesBookmark = !showBookmarkedOnly || reward.isBookmarked;
       final matchesSearch = reward.title.toLowerCase().contains(searchQuery);
       return matchesBookmark && matchesSearch;
     }).toList();
@@ -160,7 +165,26 @@ class _MissionTab2State extends State<MissionTab2> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Handle tap event
+                      if (_userData.totalPoints < int.parse(reward.points.split(" ")[0])) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Not enough points!"),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        return;
+                      } else {
+                        setState(() {
+                          _userData.addPoints(-int.parse(reward.points.split(" ")[0]));
+                          reward._isBought = true;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Bought ${reward.title}"),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      });
+                      }
                     },
                     child: Container(
                       width: 60,
@@ -174,7 +198,7 @@ class _MissionTab2State extends State<MissionTab2> {
                         ),
                       ),
                       padding: EdgeInsets.all(8),
-                      child: Icon(Icons.add, size: 24),
+                      child: reward._isBought == false ? Icon(Icons.add, size: 24) : Icon(Icons.check, size: 24),
                     ),
                   ),
                 ],
@@ -187,12 +211,12 @@ class _MissionTab2State extends State<MissionTab2> {
           child: GestureDetector(
             onTap: () {
               setState(() {
-                rewardBookmarks[reward.index] = !rewardBookmarks[reward.index];
+                reward.toggleBookmark();  // Use the new method
               });
             },
             child: Icon(
-              rewardBookmarks[reward.index] ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-              color: Colors.black,
+              reward.isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+              color: reward.isBookmarked ? Colors.blue : Colors.black,
               size: 30,
             ),
           ),
@@ -209,6 +233,16 @@ class RewardItem {
   final String points;
   final Widget image;
   final Color backgroundColor;
+  bool _isBought = false;
+  bool _isBookmarked = false;  // Add this line
 
   RewardItem(this.index, this.title, this.subtitle, this.points, this.image, this.backgroundColor);
+
+  // Add getter for bookmark status
+  bool get isBookmarked => _isBookmarked;
+  
+  // Add method to toggle bookmark
+  void toggleBookmark() {
+    _isBookmarked = !_isBookmarked;
+  }
 }

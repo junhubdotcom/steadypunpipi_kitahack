@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 class RowCategory extends StatelessWidget {
   final String rowTitle;
   final List<Map<String, dynamic>> items;
-  //final VoidCallback onViewMore;
+  final Function(String) onItemSelected;
 
   const RowCategory({
     required this.items,
     required this.rowTitle,
-    //required this.onViewMore,
+    required this.onItemSelected,
     Key? key,
   }) : super(key: key);
 
@@ -35,6 +35,9 @@ class RowCategory extends StatelessWidget {
                 child: CardWidget(
                   imageUrl: item['imageUrl'],
                   isUnlock: item['isUnlock'],
+                  onItemSelected: (imageUrl) {
+                    onItemSelected(imageUrl);
+                  },
                 ),
               ),
             );
@@ -74,10 +77,12 @@ class RowCategory extends StatelessWidget {
 class CardWidget extends StatefulWidget {
   final String imageUrl;
   final bool isUnlock;
+  final Function(String)? onItemSelected;
 
   const CardWidget({
     required this.imageUrl,
     required this.isUnlock,
+    required this.onItemSelected,
     Key? key,
   }) : super(key: key);
 
@@ -95,6 +100,13 @@ class _CardWidgetState extends State<CardWidget> {
           ? () {
               setState(() {
                 isSelected = !isSelected;
+                if (isSelected) {
+                  // Add the imageUrl to the list if selected
+                  widget.onItemSelected?.call(widget.imageUrl);
+                } else {
+                  // Pass null or handle deselection logic
+                  widget.onItemSelected?.call('');
+                }
               });
             }
           : null,
