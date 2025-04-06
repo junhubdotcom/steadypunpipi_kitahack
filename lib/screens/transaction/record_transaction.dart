@@ -1,15 +1,18 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:steadypunpipi_vhack/models/complete_expense.dart';
 import 'package:steadypunpipi_vhack/models/expense.dart';
 import 'package:steadypunpipi_vhack/models/expense_item.dart';
 import 'package:steadypunpipi_vhack/models/income.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/scanner.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/transaction_details.dart';
 import 'package:steadypunpipi_vhack/services/carbon_service.dart';
+import 'package:steadypunpipi_vhack/services/database_services.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/Itembutton.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/details_button.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/image_upload.dart';
@@ -21,8 +24,9 @@ import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_butt
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_textfield.dart';
 
 class RecordTransaction extends StatefulWidget {
-  Expense? expense;
-  RecordTransaction({this.expense, super.key});
+  // Expense? expense;
+  CompleteExpense? completeExpense;
+  RecordTransaction({this.completeExpense, super.key});
 
   @override
   State<RecordTransaction> createState() => _RecordTransactionState();
@@ -34,6 +38,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
 
   // can be expense and also income, depends on the button that user clicked
   late dynamic transaction;
+  late List<ExpenseItem> expenseItems;
 
   // String? receipt;
   // String? thing_image;
@@ -45,16 +50,17 @@ class _RecordTransactionState extends State<RecordTransaction> {
   void initState() {
     super.initState();
     isExpense = true;
-    isMultipleItem = false;
-    // transaction = Expense();
     transaction = isExpense
-        ? widget.expense != null
-            ? widget.expense
-            : Expense()
+        ? widget.completeExpense?.generalDetails ?? Expense()
         : Income();
+    expenseItems = widget.completeExpense?.items ?? [ExpenseItem()];
+    isMultipleItem = expenseItems.length > 1 ? true : false;
+    // transaction = Expense();
   }
 
   CarbonService carbonService = CarbonService();
+  DatabaseService db = DatabaseService();
+
   Future pickImage(ImageSource source, bool isReceipt) async {
     try {
       XFile? image = await ImagePicker().pickImage(source: source);
@@ -93,7 +99,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
       time.minute,
     );
     setState(() {
-      transaction.dateTime = newDateTime;
+      transaction.dateTime = Timestamp.fromDate(newDateTime);
     });
   }
 
@@ -110,6 +116,27 @@ class _RecordTransactionState extends State<RecordTransaction> {
         hour: transaction.dateTime.hour,
         minute: transaction.dateTime.minute,
       ));
+
+  Future<DocumentReference<Expense>> saveExpense(Expense expense) async {
+    try {
+      List<String> itemIds = [];
+      print("ExpenseItems: $expenseItems");
+      for (ExpenseItem item in expenseItems) {
+        final ref = await db.addExpenseItem(item);
+        itemIds.add(ref.id);
+        print("ItemIds:$itemIds");
+      }
+      print("Item Ids: $itemIds");
+      for (String itemId in itemIds) {
+        transaction.items.add(itemId);
+      }
+      final expenseRef = await db.addExpense(expense);
+      return expenseRef;
+    } catch (e) {
+      print("Error saving expense with items: $e");
+      rethrow;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +174,9 @@ class _RecordTransactionState extends State<RecordTransaction> {
                         onPressed: () {
                           setState(() {
                             isExpense = true;
-                            transaction = Expense();
+                            transaction =
+                                widget.completeExpense?.generalDetails ??
+                                    Expense();
                           });
                         }),
                     TransactionButton(
@@ -202,10 +231,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
                                       }),
                                   SmallTitle(title: "Item"),
                                   ItemHeader(),
-                                  ...transaction.items
-                                      .asMap()
-                                      .entries
-                                      .map((entry) {
+                                  ...expenseItems.asMap().entries.map((entry) {
                                     // int index = entry.key;
                                     ExpenseItem item = entry.value;
                                     return ItemList(
@@ -227,8 +253,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
                                       ItemButton(
                                         onPressed: () {
                                           setState(() {
-                                            transaction.items
-                                                .add(ExpenseItem());
+                                            expenseItems.add(ExpenseItem());
                                           });
                                         },
                                         icon: Icons.add,
@@ -236,7 +261,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
                                       ItemButton(
                                         onPressed: () {
                                           setState(() {
-                                            transaction.items.removeLast();
+                                            expenseItems.removeLast();
                                           });
                                         },
                                         icon: Icons.remove,
@@ -250,19 +275,19 @@ class _RecordTransactionState extends State<RecordTransaction> {
                                   SmallTitle(title: "Item"),
                                   ItemHeader(),
                                   ItemList(
-                                    item: transaction.items.first,
+                                    item: expenseItems.first,
                                     onNameChanged: (value) {
-                                      transaction.items.first.name = value!;
+                                      expenseItems.first.name = value!;
                                     },
                                     onCategoryChanged: (value) {
-                                      transaction.items.first.category = value!;
+                                      expenseItems.first.category = value!;
                                     },
                                     onPriceChanged: (value) {
-                                      transaction.items.first.price =
+                                      expenseItems.first.price =
                                           double.tryParse(value!) ?? 0;
                                     },
                                     onQuantityChanged: (value) {
-                                      transaction.items.first.quantity =
+                                      expenseItems.first.quantity =
                                           int.tryParse(value!) ?? 0;
                                     },
                                   )
@@ -359,7 +384,7 @@ class _RecordTransactionState extends State<RecordTransaction> {
                   },
                   child: Text(
                       DateFormat('dd MMMM yyyy HH:mm')
-                          .format(transaction.dateTime),
+                          .format(transaction.dateTime.toDate()),
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w400,
@@ -456,10 +481,30 @@ class _RecordTransactionState extends State<RecordTransaction> {
                     buttonColor: 0xff74c95c,
                     button_text: "Done",
                     onPressed: () async {
+                      String expenseRefId = "";
                       if (isExpense) {
-                        await carbonService.generateCarbonApiJson(transaction);
+                        for (ExpenseItem item in expenseItems) {
+                          if (item.name.isEmpty ||
+                              item.category.isEmpty ||
+                              item.quantity == 0 ||
+                              item.price == 0) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              duration: Duration(seconds: 1),
+                              content: Text(
+                                  "Please ensure that the item(s) are not empty."),
+                              backgroundColor: Colors.red,
+                            ));
+                            return;
+                          }
+                        }
+                        await carbonService.generateCarbonApiJson(
+                            transaction, expenseItems);
+                        final expenseRef = await saveExpense(transaction);
+                        expenseRefId = expenseRef.id;
+                      } else {
+                        final incomeRef = await db.addIncome(transaction);
                       }
-                      print(transaction);
+
                       Navigator.push(
                           context,
                           MaterialPageRoute(

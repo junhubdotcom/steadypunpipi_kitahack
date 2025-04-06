@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:steadypunpipi_vhack/models/complete_expense.dart';
 import 'package:steadypunpipi_vhack/models/expense.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/record_transaction.dart';
 import 'package:steadypunpipi_vhack/services/api_service.dart';
@@ -59,14 +60,14 @@ class _ReceiptPhotoState extends State<ReceiptPhoto> {
                       shape: CircleBorder(),
                       onPressed: () async {
                         print("Generate Content");
-                        Expense expense =
+                        CompleteExpense completeExpense =
                             await _apiService.generateContent(widget.imgPath);
                         print("Content Generated");
                         Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => RecordTransaction(
-                                      expense: expense,
+                                      completeExpense: completeExpense,
                                     )));
                       },
                     ),
