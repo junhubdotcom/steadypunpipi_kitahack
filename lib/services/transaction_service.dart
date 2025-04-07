@@ -1,124 +1,84 @@
-import 'dart:convert';
-import 'package:flutter/services.dart';
-import 'package:steadypunpipi_vhack/models/breakdown_item.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:steadypunpipi_vhack/models/finance_data.dart';
 import 'package:steadypunpipi_vhack/models/transaction_model.dart';
 
 class TransactionService {
-  List<TransactionModel> _transactions = [];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Load transactions from JSON file
-  Future<void> loadTransactions() async {
-    if (_transactions.isNotEmpty) return; // Prevent reloading if already loaded
+  Future<List<TransactionModel>> fetchTransactions(
+      DateTime startDate, DateTime endDate) async {
+    List<TransactionModel> transactions = [];
 
-    try {
-      final String response =
-          await rootBundle.loadString('assets/transactions.json');
-      final data = json.decode(response);
+    // Fetch income
+    final incomeSnapshot = await _firestore
+        .collection("Income")
+        .where("dateTime",
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+        .where("dateTime", isLessThanOrEqualTo: Timestamp.fromDate(endDate))
+        .get();
 
-      _transactions = (data['transactions'] as List)
-          .map((tx) => TransactionModel.fromJSON(tx))
-          .toList();
-
-      print("✅ Transactions loaded successfully: ${_transactions.length}");
-    } catch (e) {
-      print("🚨 Error loading transactions: $e");
+    for (var doc in incomeSnapshot.docs) {
+      final data = doc.data();
+      transactions.add(TransactionModel(
+        id: doc.id,
+        date: data['dateTime'].toDate(),
+        category: data['category'] ?? 'Unknown',
+        amount: (data['amount'] as num).toDouble(),
+        type: 'income',
+        carbonFootprint: 0,
+        description: data['name'] ?? '',
+      ));
     }
-  }
 
-  // Ensure transactions are loaded before filtering
-  Future<void> ensureTransactionsLoaded() async {
-    if (_transactions.isEmpty) {
-      print("📥 Loading transactions...");
-      await loadTransactions();
-    }
-  }
+    // Fetch expense
+    final expenseSnapshot = await _firestore
+        .collection("Expense")
+        .where("dateTime",
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+        .where("dateTime", isLessThanOrEqualTo: Timestamp.fromDate(endDate))
+        .get();
 
-  // Debugging: Print loaded transactions
-  void debugTransactions() {
-    print("📊 Transactions Loaded: ${_transactions.length}");
-    for (var tx in _transactions) {
-      print("🔹 ${tx.date} - ${tx.category} - ${tx.amount}");
-    }
-  }
+    for (var expenseDoc in expenseSnapshot.docs) {
+      final expense = expenseDoc.data();
+      final List<dynamic> itemRefs = expense['items'] ?? [];
 
-  // Filter transactions based on time range
-  List<TransactionModel> filterTransactions(
-      DateTime startDate, DateTime endDate) {
-    print("📅 Filtering Transactions from $startDate to $endDate");
-    print(
-        "📜 All Transactions Dates: ${_transactions.map((tx) => tx.date).toList()}");
+      for (final ref in itemRefs) {
+        if (ref is DocumentReference) {
+          final itemSnap = await ref.get();
+          if (!itemSnap.exists) continue;
+          print("📦 Raw item snapshot: ${itemSnap.data()}");
+          final item = itemSnap.data() as Map<String, dynamic>;
+          print("💰 Price: ${item['price']} (${item['price']?.runtimeType})");
+          print(
+              "📦 Quantity: ${item['quantity']} (${item['quantity']?.runtimeType})");
+          print(
+              "🌱 CO2: ${item['carbon_footprint']} (${item['carbon_footprint']?.runtimeType})");
 
-    List<TransactionModel> filtered = _transactions.where((tx) {
-      bool isWithinRange =
-          tx.date.isAfter(startDate.subtract(Duration(days: 1))) &&
-              tx.date.isBefore(endDate.add(Duration(days: 1)));
-
-      if (isWithinRange) print("✅ Matched Transaction: ${tx.toJSON()}");
-
-      return isWithinRange;
-    }).toList();
-
-    print("🔍 Filtered Transactions (${filtered.length}): $filtered");
-    return filtered;
-  }
-
-  // Filter transactions by type
-  Future<List<BreakdownItem>> fetchExpenses() async {
-    await ensureTransactionsLoaded();
-
-    Map<String, double> expenseMap = {};
-
-    for (var tx in _transactions) {
-      if (tx.type == 'expense') {
-        expenseMap.update(tx.category, (value) => value + tx.amount,
-            ifAbsent: () => tx.amount);
+          transactions.add(TransactionModel(
+            id: expenseDoc.id,
+            date: expense['dateTime'].toDate(),
+            category: item['category'] ?? 'General',
+            amount: (item['price'] is String
+                    ? double.tryParse(item['price']) ?? 0
+                    : (item['price'] as num).toDouble()) *
+                ((item['quantity'] ?? 1) as num).toDouble(),
+            type: 'expense',
+            carbonFootprint: item['carbon_footprint'] != null
+                ? (item['carbon_footprint'] is String
+                    ? double.tryParse(item['carbon_footprint']) ?? 0
+                    : (item['carbon_footprint'] as num).toDouble())
+                : 0,
+            description: item['name'] ?? expense['transactionName'] ?? '',
+          ));
+        }
       }
     }
 
-    return expenseMap.entries
-        .map((e) => BreakdownItem(category: e.key, value: e.value))
-        .toList();
-  }
-
-  Future<List<BreakdownItem>> fetchIncome() async {
-    await ensureTransactionsLoaded();
-
-    Map<String, double> incomeMap = {};
-
-    for (var tx in _transactions) {
-      if (tx.type == 'income') {
-        incomeMap.update(tx.category, (value) => value + tx.amount,
-            ifAbsent: () => tx.amount);
-      }
-    }
-
-    return incomeMap.entries
-        .map((e) => BreakdownItem(category: e.key, value: e.value))
-        .toList();
-  }
-
-  Future<List<BreakdownItem>> fetchCO2() async {
-    await ensureTransactionsLoaded();
-
-    Map<String, double> co2Map = {};
-
-    for (var tx in _transactions) {
-      if (tx.carbonFootprint != null) {
-        co2Map.update(tx.category, (value) => value + tx.carbonFootprint!,
-            ifAbsent: () => tx.carbonFootprint!);
-      }
-    }
-
-    return co2Map.entries
-        .map((e) => BreakdownItem(category: e.key, value: e.value))
-        .toList();
+    return transactions;
   }
 
   Future<List<FinanceCO2Data>> processFCO2(
       List<TransactionModel> transactions, String period) async {
-    await ensureTransactionsLoaded();
-
     Map<String, FinanceCO2Data> groupedData = {};
 
     for (var transaction in transactions) {
@@ -142,8 +102,7 @@ class TransactionService {
 
   String getGroupingKey(DateTime date, String period) {
     if (period == "Daily") {
-      String timeSlot = getTimeSlot(date);
-      return "$timeSlot";
+      return getTimeSlot(date);
     } else if (period == "Weekly") {
       DateTime startOfWeek = getStartOfWeek(date);
       return "${startOfWeek.day}/${startOfWeek.month}";
@@ -155,33 +114,22 @@ class TransactionService {
     }
   }
 
-  /// **Returns the time slot (6-hour interval)**
   String getTimeSlot(DateTime date) {
     int hour = date.hour;
-
-    if (hour < 6) {
-      return "12AM";
-    } else if (hour < 12) {
-      return "6AM";
-    } else if (hour < 18) {
-      return "12PM";
-    } else {
-      return "6PM";
-    }
+    if (hour < 6) return "12AM";
+    if (hour < 12) return "6AM";
+    if (hour < 18) return "12PM";
+    return "6PM";
   }
 
-  /// Get the Sunday of the current week
   DateTime getStartOfWeek(DateTime date) {
-    int daysSinceSunday =
-        date.weekday % 7; // Convert Monday-Sunday (1-7) to (0-6)
+    int daysSinceSunday = date.weekday % 7;
     return date.subtract(Duration(days: daysSinceSunday));
   }
 
-  /// Get the week number in a month (1-5)
   int getWeekInMonth(DateTime date) {
     DateTime firstDayOfMonth = DateTime(date.year, date.month, 1);
-    int firstDayWeekday =
-        firstDayOfMonth.weekday % 7; // Convert Mon-Sun (1-7) to (0-6)
+    int firstDayWeekday = firstDayOfMonth.weekday % 7;
     return ((date.day + firstDayWeekday - 1) ~/ 7) + 1;
   }
 }

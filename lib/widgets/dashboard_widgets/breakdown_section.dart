@@ -37,6 +37,7 @@ Widget expenseTab(BuildContext context, List<TransactionModel> transactions) {
     unit: "RM",
     valueColor: Colors.red,
     type: "Expense",
+    transactions: transactions,
   );
 }
 
@@ -48,6 +49,7 @@ Widget incomeTab(BuildContext context, List<TransactionModel> transactions) {
     unit: "RM",
     valueColor: const Color.fromRGBO(76, 175, 80, 1),
     type: "Income",
+    transactions: transactions,
   );
 }
 
@@ -59,11 +61,13 @@ Widget carbonTab(BuildContext context, List<TransactionModel> transactions) {
     unit: "kg CO₂",
     valueColor: Colors.blueGrey,
     type: "CO2",
+    transactions: transactions,
   );
 }
 
 /// **Process transactions based on type (expense/income)**
-List<BreakdownItem> processTransactions(List<TransactionModel> transactions, String type) {
+List<BreakdownItem> processTransactions(
+    List<TransactionModel> transactions, String type) {
   Map<String, double> categoryTotals = {};
 
   for (var transaction in transactions) {
@@ -73,7 +77,9 @@ List<BreakdownItem> processTransactions(List<TransactionModel> transactions, Str
     }
   }
 
-  return categoryTotals.entries.map((e) => BreakdownItem(category: e.key, value: e.value)).toList();
+  return categoryTotals.entries
+      .map((e) => BreakdownItem(category: e.key, value: e.value))
+      .toList();
 }
 
 /// **Process CO₂ emissions from transactions**
@@ -81,11 +87,14 @@ List<BreakdownItem> processCO2(List<TransactionModel> transactions) {
   Map<String, double> categoryCO2 = {};
 
   for (var transaction in transactions) {
-    if (transaction.carbonFootprint != null) {
+    if (transaction.carbonFootprint != null && transaction.carbonFootprint! > 0) {
       categoryCO2[transaction.category] =
-          (categoryCO2[transaction.category] ?? 0) + transaction.carbonFootprint!;
+          (categoryCO2[transaction.category] ?? 0) +
+              transaction.carbonFootprint!;
     }
   }
 
-  return categoryCO2.entries.map((e) => BreakdownItem(category: e.key, value: e.value)).toList();
+  return categoryCO2.entries
+      .map((e) => BreakdownItem(category: e.key, value: e.value))
+      .toList();
 }

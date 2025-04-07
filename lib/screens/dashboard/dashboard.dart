@@ -1,11 +1,12 @@
-import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:steadypunpipi_vhack/common/constants.dart';
 import 'package:steadypunpipi_vhack/models/finance_data.dart';
 import 'package:steadypunpipi_vhack/models/transaction_model.dart';
-import 'package:steadypunpipi_vhack/services/gemini_service.dart';
 import 'package:steadypunpipi_vhack/services/transaction_service.dart';
+
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/dashboard_settings.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/date_selector.dart';
 import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/breakdown_section.dart';
@@ -22,14 +23,13 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   int _selectedIndex = 1; // Default to "Weekly"
   final TransactionService _transactionService = TransactionService();
-  final GeminiService _geminiService = GeminiService();
 
   List<TransactionModel> transactions = [];
   List<FinanceCO2Data> trendData = [];
   Map<String, dynamic> geminiData = {
-    "insights": [],
-    "financeTips": [],
-    "environmentTips": [],
+    "insights": [""],
+    "financeTips": [""],
+    "environmentTips": [""],
   };
 
   bool isLoadingAI = false;
@@ -51,34 +51,28 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _loadData(DateTime selectedDate) async {
-    await _transactionService.loadTransactions();
-
     DateTime startDate;
-    DateTime endDate = selectedDate; // Use the passed date instead of now
+    DateTime endDate = selectedDate;
 
     if (_selectedIndex == 0) {
-      startDate = selectedDate; // Daily (use selected date as start)
+      startDate = selectedDate;
     } else if (_selectedIndex == 1) {
-      startDate = selectedDate
-          .subtract(Duration(days: selectedDate.weekday - 1)); // Weekly
-      endDate = startDate.add(Duration(days: 6)); // Full week range
+      startDate =
+          selectedDate.subtract(Duration(days: selectedDate.weekday - 1));
+      endDate = startDate.add(Duration(days: 6));
     } else {
-      startDate = DateTime(selectedDate.year, selectedDate.month, 1); // Monthly
-      endDate = DateTime(
-          selectedDate.year, selectedDate.month + 1, 0); // End of month
+      startDate = DateTime(selectedDate.year, selectedDate.month, 1);
+      endDate = DateTime(selectedDate.year, selectedDate.month + 1, 0);
     }
 
-    // Fetch transactions based on the selected date range
     var filteredTransactions =
-        await _transactionService.filterTransactions(startDate, endDate);
-
-    // Process trend data
+        await _transactionService.fetchTransactions(startDate, endDate);
     var newTrendData = await _transactionService.processFCO2(
         filteredTransactions, getSelectedPeriod());
 
     setState(() {
       _selectedDate = selectedDate;
-      transactions = filteredTransactions.toList();
+      transactions = filteredTransactions;
       trendData = newTrendData;
     });
 
@@ -90,22 +84,54 @@ class _DashboardPageState extends State<DashboardPage> {
       isLoadingAI = true;
     });
 
-    String dateRange = "${startDate.toLocal()} - ${endDate.toLocal()}";
+    final String period = getSelectedPeriod().toLowerCase();
+    final String id = getInsightId(period, startDate);
+
+    print("📅 Fetching AI insights for: $period");
+    print("🆔 Document ID: $id");
+    print(
+        "📆 Date range: ${startDate.toIso8601String()} - ${endDate.toIso8601String()}");
 
     try {
-      Map<String, dynamic> aiResponse =
-          await _geminiService.generateInsightsAndTips(
-              transactions.map((tx) => tx.toJSON()).toList(), dateRange);
-      setState(() {
-        geminiData = {
-          "insights": List<String>.from(aiResponse["insights"] ?? []),
-          "financeTips": List<String>.from(aiResponse["financeTips"] ?? []),
-          "environmentTips":
-              List<String>.from(aiResponse["environmentTips"] ?? []),
-        };
-      });
+      final snapshot = await FirebaseFirestore.instance
+          .collection('InsightsSummary')
+          .doc(id)
+          .get();
+
+      if (!snapshot.exists) {
+        print("⚠️ No document found for $id");
+      }
+      
+      final data = snapshot.data();
+
+      if (data != null) {
+        setState(() {
+          geminiData = {
+            "insights": (data["insights"] as List<dynamic>?)
+                    ?.map((e) => e.toString())
+                    .toList() ??
+                [],
+            "financeTips": (data["financeTips"] as List<dynamic>?)
+                    ?.map((e) => e.toString())
+                    .toList() ??
+                [],
+            "environmentTips": (data["environmentTips"] as List<dynamic>?)
+                    ?.map((e) => e.toString())
+                    .toList() ??
+                [],
+          };
+        });
+      } else {
+        setState(() {
+          geminiData = {
+            "insights": ["No insights available."],
+            "financeTips": [],
+            "environmentTips": [],
+          };
+        });
+      }
     } catch (e) {
-      print("🚨 Failed to fetch AI insights: $e");
+      print("🚨 Error fetching insights: $e");
     } finally {
       setState(() {
         isLoadingAI = false;
@@ -113,7 +139,16 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  /// Returns "Daily", "Weekly", or "Monthly" based on `_selectedIndex`
+  String getInsightId(String period, DateTime date) {
+    final y = date.year;
+    final m = date.month.toString().padLeft(2, '0');
+    final d = date.day.toString().padLeft(2, '0');
+
+    if (period == "daily") return "daily_${y}-${m}-${d}";
+    if (period == "weekly") return "weekly_${y}-${m}-${d}";
+    return "monthly_${y}-${m}";
+  }
+
   String getSelectedPeriod() {
     return _selectedIndex == 0
         ? "Daily"
@@ -161,7 +196,12 @@ class _DashboardPageState extends State<DashboardPage> {
               },
             ),
             if (sectionVisibility["Summary"] ?? false)
-              SummarySection(insights: geminiData["insights"], transactions: transactions),
+              isLoadingAI
+                  ? loadingSummary()
+                  : SummarySection(
+                      insights: List<String>.from(geminiData["insights"] ?? []),
+                      transactions: transactions,
+                    ),
             if (sectionVisibility["Breakdown"] ?? false)
               BreakdownSection(transactions: transactions),
             if (sectionVisibility["Trend"] ?? false)
@@ -170,9 +210,11 @@ class _DashboardPageState extends State<DashboardPage> {
               isLoadingAI
                   ? loadingTips()
                   : TipsSection(
-                      financeTips: geminiData["financeTips"],
-                      environmentTips: geminiData["environmentTips"])
-            // InsightsSection(insights: isLoadingAI ? ["Fetching AI insights..."] : geminiData["insights"]),
+                      financeTips:
+                          List<String>.from(geminiData["financeTips"] ?? []),
+                      environmentTips: List<String>.from(
+                          geminiData["environmentTips"] ?? []),
+                    ),
           ],
         ),
       ),
@@ -196,6 +238,4 @@ class _DashboardPageState extends State<DashboardPage> {
       },
     );
   }
-
-  
 }

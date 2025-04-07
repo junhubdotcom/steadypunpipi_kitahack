@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:steadypunpipi_vhack/common/constants.dart';
 import 'package:steadypunpipi_vhack/models/breakdown_item.dart';
+import 'package:steadypunpipi_vhack/models/transaction_model.dart';
 import 'package:steadypunpipi_vhack/screens/dashboard/breakdown_detail.dart';
-import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/breakdown_chart.dart';
+import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/fallback_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 Widget buildBreakdownTab({
   required BuildContext context,
@@ -12,38 +13,45 @@ Widget buildBreakdownTab({
   required String unit,
   required Color valueColor,
   required String type,
+  required List<TransactionModel> transactions,
 }) {
-  double totalValue = data.fold(0, (sum, item) => sum + item.value);
-
-  return SingleChildScrollView(
-    child: Column(
-      children: [
-        BreakdownChart(title: title, data: data),
-        Align(
-          alignment: Alignment.center,
-          child: GestureDetector(
-            onTap: () =>
-                _showBreakdownSheet(context, data, valueColor, unit, type),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.touch_app, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
-                Text(
-                  "Click to see detailed breakdown",
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+  return data.isEmpty
+      ? FallbackChart()
+      : SingleChildScrollView(
+          child: Column(
+            children: [
+              BreakdownChart(title: title, data: data),
+              Align(
+                alignment: Alignment.center,
+                child: GestureDetector(
+                  onTap: () => _showBreakdownSheet(
+                      context, data, valueColor, unit, type, transactions),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.touch_app, size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        "Click here to see detailed breakdown",
+                        style: TextStyle(
+                            color: Colors.grey.shade600, fontSize: 12),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ),
-      ],
-    ),
-  );
+        );
 }
 
-void _showBreakdownSheet(BuildContext context, List<BreakdownItem> data,
-    Color valueColor, String unit, String type) {
+void _showBreakdownSheet(
+    BuildContext context,
+    List<BreakdownItem> data,
+    Color valueColor,
+    String unit,
+    String type,
+    List<TransactionModel> transactions) {
   double totalValue = data.fold(0, (sum, item) => sum + item.value);
 
   showModalBottomSheet(
@@ -71,7 +79,8 @@ void _showBreakdownSheet(BuildContext context, List<BreakdownItem> data,
                 children: [
                   if (index == 0)
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 16),
                       child: Text(
                         "Select a category to explore all related transactions.",
                         textAlign: TextAlign.center,
@@ -83,15 +92,15 @@ void _showBreakdownSheet(BuildContext context, List<BreakdownItem> data,
                       ),
                     ),
                   _buildBreakdownItem(
-                    context: context,
-                    item: item,
-                    category: item.category,
-                    value: item.value,
-                    percentage: percentage,
-                    unit: unit,
-                    valueColor: valueColor,
-                    type: type,
-                  )
+                      context: context,
+                      item: item,
+                      category: item.category,
+                      value: item.value,
+                      percentage: percentage,
+                      unit: unit,
+                      valueColor: valueColor,
+                      type: type,
+                      transactions: transactions)
                 ],
               );
             },
@@ -100,6 +109,61 @@ void _showBreakdownSheet(BuildContext context, List<BreakdownItem> data,
       );
     },
   );
+}
+
+class BreakdownChart extends StatelessWidget {
+  final String title;
+  final List<BreakdownItem> data;
+
+  const BreakdownChart({
+    super.key,
+    required this.title,
+    required this.data,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double total = data.fold(0, (sum, item) => sum + item.value);
+    bool isCO2 = title.toLowerCase().contains("co₂");
+
+    return SizedBox(
+      height: 250,
+      child: SfCircularChart(
+        title: ChartTitle(
+          text: title,
+          textStyle: GoogleFonts.quicksand(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        legend: Legend(
+          isVisible: true,
+          overflowMode: LegendItemOverflowMode.wrap,
+          position: LegendPosition.bottom,
+        ),
+        series: <CircularSeries>[
+          PieSeries<BreakdownItem, String>(
+            dataSource: data,
+            xValueMapper: (BreakdownItem item, _) => item.category,
+            yValueMapper: (BreakdownItem item, _) => item.value,
+            dataLabelMapper: (BreakdownItem item, _) {
+              final valueStr = isCO2
+                  ? "${item.value.toStringAsFixed(1)} kg"
+                  : "RM ${item.value.toStringAsFixed(2)}";
+              final percent = ((item.value / total) * 100).toStringAsFixed(0);
+              return "$valueStr\n$percent%";
+            },
+            dataLabelSettings: const DataLabelSettings(
+              isVisible: true,
+              labelPosition: ChartDataLabelPosition.outside,
+              connectorLineSettings: ConnectorLineSettings(width: 1),
+              textStyle: TextStyle(fontSize: 11),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 Widget _buildBreakdownItem({
@@ -111,6 +175,7 @@ Widget _buildBreakdownItem({
   required BuildContext context,
   required BreakdownItem item,
   required String type,
+  required List<TransactionModel> transactions,
 }) {
   String formattedValue;
   Color textColor;
@@ -134,6 +199,7 @@ Widget _buildBreakdownItem({
           builder: (context) => BreakdownDetailPage(
             category: item.category,
             type: type,
+            transactions: transactions,
           ),
         ),
       );
