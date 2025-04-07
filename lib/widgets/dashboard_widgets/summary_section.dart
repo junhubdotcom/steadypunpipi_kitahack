@@ -127,14 +127,14 @@ class SummaryData {
 
   double get totalIncome {
     return transactions
-        .where((tx) => tx.amount > 0)
+        .where((tx) => tx.type == 'income')
         .fold(0.0, (sum, tx) => sum + tx.amount);
   }
 
   double get totalExpense {
     return transactions
-        .where((tx) => tx.amount < 0)
-        .fold(0.0, (sum, tx) => sum + tx.amount.abs());
+        .where((tx) => tx.type == 'expense')
+        .fold(0.0, (sum, tx) => sum + tx.amount);
   }
 
   double get totalCO2 {

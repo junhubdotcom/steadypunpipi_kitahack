@@ -87,7 +87,7 @@ List<BreakdownItem> processCO2(List<TransactionModel> transactions) {
   Map<String, double> categoryCO2 = {};
 
   for (var transaction in transactions) {
-    if (transaction.carbonFootprint != null) {
+    if (transaction.carbonFootprint != null && transaction.carbonFootprint! > 0) {
       categoryCO2[transaction.category] =
           (categoryCO2[transaction.category] ?? 0) +
               transaction.carbonFootprint!;
