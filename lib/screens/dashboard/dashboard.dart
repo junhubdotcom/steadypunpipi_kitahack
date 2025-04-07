@@ -27,9 +27,9 @@ class _DashboardPageState extends State<DashboardPage> {
   List<TransactionModel> transactions = [];
   List<FinanceCO2Data> trendData = [];
   Map<String, dynamic> geminiData = {
-    "insights": [""],
-    "financeTips": [""],
-    "environmentTips": [""],
+    "insights": [],
+    "financeTips": [],
+    "environmentTips": [],
   };
 
   bool isLoadingAI = false;
@@ -69,7 +69,10 @@ class _DashboardPageState extends State<DashboardPage> {
         await _transactionService.fetchTransactions(startDate, endDate);
     var newTrendData = await _transactionService.processFCO2(
         filteredTransactions, getSelectedPeriod());
+    print("📅 Loading transactions from $startDate to $endDate");
+    print("🧾 Loaded ${filteredTransactions.length} transactions");
 
+    if (!mounted) return;
     setState(() {
       _selectedDate = selectedDate;
       transactions = filteredTransactions;
@@ -101,7 +104,7 @@ class _DashboardPageState extends State<DashboardPage> {
       if (!snapshot.exists) {
         print("⚠️ No document found for $id");
       }
-      
+
       final data = snapshot.data();
 
       if (data != null) {
@@ -133,6 +136,7 @@ class _DashboardPageState extends State<DashboardPage> {
     } catch (e) {
       print("🚨 Error fetching insights: $e");
     } finally {
+      if (!mounted) return;
       setState(() {
         isLoadingAI = false;
       });
@@ -190,7 +194,6 @@ class _DashboardPageState extends State<DashboardPage> {
               onSelectionChanged: (newIndex, selectedDate) {
                 setState(() {
                   _selectedIndex = newIndex;
-                  _selectedDate = selectedDate;
                 });
                 _loadData(selectedDate);
               },
