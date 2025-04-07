@@ -43,9 +43,26 @@ class DatabaseService {
       return snapshot.docs.map((doc) => doc.data()).toList();
     } catch (e) {
       print("Error getting all expenses: $e");
-      return []; // Or handle the error as needed
+      return []; 
     }
   }
+
+  Future<List<Expense>> getExpensesByDay(DateTime targetDate) async {
+  try {
+    DateTime startOfDay = targetDate.copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
+    DateTime endOfDay = targetDate.copyWith(hour: 23, minute: 59, second: 59, millisecond: 999, microsecond: 999);
+
+    QuerySnapshot<Expense> snapshot = await expensesCollection
+        .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
+        .where('dateTime', isLessThanOrEqualTo: endOfDay)
+        .get();
+
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  } catch (e) {
+    print("Error getting expenses for ${targetDate.toLocal().toString().split(' ')[0]}: $e");
+    return [];
+  }
+}
 
   Future<DocumentReference<Expense>> addExpense(Expense expense) async {
     return await expensesCollection.add(expense);

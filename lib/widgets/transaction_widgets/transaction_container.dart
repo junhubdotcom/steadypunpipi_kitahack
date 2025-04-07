@@ -3,9 +3,20 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/transaction_details.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/label.dart';
 
-class TransactionContainer extends StatelessWidget {
-  const TransactionContainer({super.key});
+class TransactionContainer extends StatefulWidget {
+  final String transactionName;
+  final String paymentMethod;
 
+  const TransactionContainer({super.key,
+    required this.transactionName,
+    required this.paymentMethod,
+  });
+
+  @override
+  State<TransactionContainer> createState() => _TransactionContainerState();
+}
+
+class _TransactionContainerState extends State<TransactionContainer> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -28,7 +39,7 @@ class TransactionContainer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Lotus',
+                  widget.transactionName.isEmpty ? 'No transaction name' : widget.transactionName,
                   style: GoogleFonts.quicksand(
                       color: Colors.black,
                       fontSize: 16,
