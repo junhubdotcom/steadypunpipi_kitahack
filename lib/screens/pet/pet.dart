@@ -37,7 +37,7 @@ class _PetPageState extends State<PetPage> {
 
   void _fetchAndPrintExpenses() async {
     print("Fetching expenses...");
-    final expense = await _databaseService.getExpense("6PVARbRi0zXzKw4BmZvi");
+    final expense = await _databaseService.getExpense("4JggmstLee6VNIZ0zczn");
     if (expense != null) {
       print(
           "Expense: ${expense.dateTime}, ${expense.items}, ${expense.transactionName}");

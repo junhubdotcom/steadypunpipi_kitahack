@@ -5,10 +5,9 @@ import 'package:steadypunpipi_vhack/models/income.dart';
 // import 'package:steadypunpipi_vhack/models/expensealt.dart';
 // import 'package:steadypunpipi_vhack/models/expense_itemalt.dart';
 
-const String EXPENSE_COLLECTION_REF = "Expense";
-const String INCOME_COLLECTION_REF = "Income";
-const String EXPENSE_ITEM_COLLECTION_REF = "ExpenseItem";
-
+const String EXPENSE_COLLECTION_REF = "test";
+const String INCOME_COLLECTION_REF = "testIncome";
+const String EXPENSE_ITEM_COLLECTION_REF = "testItem";
 
 class DatabaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -19,14 +18,13 @@ class DatabaseService {
                 snapshots.data()!,
               ),
           toFirestore: (expense, _) => (expense as Expense).toJson());
-  
 
   CollectionReference<Income> get incomesCollection =>
-    _firestore.collection(INCOME_COLLECTION_REF).withConverter<Income>(
-        fromFirestore: (snapshots, _) => Income.fromJson(
-              snapshots.data()!,
-            ),
-        toFirestore: (income, _) => (income as Income).toJson());
+      _firestore.collection(INCOME_COLLECTION_REF).withConverter<Income>(
+          fromFirestore: (snapshots, _) => Income.fromJson(
+                snapshots.data()!,
+              ),
+          toFirestore: (income, _) => (income as Income).toJson());
 
   CollectionReference<ExpenseItem> get expenseItemsCollection => _firestore
       .collection(EXPENSE_ITEM_COLLECTION_REF)
@@ -67,7 +65,7 @@ class DatabaseService {
   }
 
   //Income
- Future<DocumentReference<Income>> addIncome(Income income) async {
+  Future<DocumentReference<Income>> addIncome(Income income) async {
     return await incomesCollection.add(income);
   }
 
