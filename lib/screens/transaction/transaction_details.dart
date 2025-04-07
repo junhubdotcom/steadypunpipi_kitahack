@@ -19,8 +19,12 @@ import 'package:steadypunpipi_vhack/widgets/transaction_widgets/small_title.dart
 class TransactionDetails extends StatefulWidget {
   String transactionId;
   bool isExpense;
+  bool fromForm;
   TransactionDetails(
-      {required this.transactionId, required this.isExpense, super.key});
+      {required this.transactionId,
+      required this.isExpense,
+      required this.fromForm,
+      super.key});
 
   @override
   State<TransactionDetails> createState() => _TransactionDetailsState();
@@ -120,7 +124,6 @@ class _TransactionDetailsState extends State<TransactionDetails> {
           ),
         ),
         centerTitle: true,
-       
       ),
       body: isLoading
           ? Center(
@@ -267,23 +270,34 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      DetailsButton(
-                          textColor: 0xffe6e6e6,
-                          buttonColor: 0xff999999,
-                          button_text: "Delete",
-                          onPressed: () {
-                            Navigator.pop(context);
-                          }),
-                      DetailsButton(
+                  child: widget.fromForm
+                      ? DetailsButton(
                           textColor: 0xff000000,
                           buttonColor: 0xff999974c95c,
-                          button_text: "Edit",
-                          onPressed: () {})
-                    ],
-                  ),
+                          button_text: "Done",
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => TransactionPage()));
+                          })
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            DetailsButton(
+                                textColor: 0xffe6e6e6,
+                                buttonColor: 0xff999999,
+                                button_text: "Delete",
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                }),
+                            DetailsButton(
+                                textColor: 0xff000000,
+                                buttonColor: 0xff999974c95c,
+                                button_text: "Edit",
+                                onPressed: () {})
+                          ],
+                        ),
                 )
               ],
             ),

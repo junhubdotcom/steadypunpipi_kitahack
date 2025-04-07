@@ -513,7 +513,9 @@ class _RecordTransactionState extends State<RecordTransaction> {
                               builder: (context) => TransactionDetails(
                                   transactionId:
                                       isExpense ? expenseRefId : incomeRefId,
-                                  isExpense: isExpense)));
+                                  isExpense: isExpense,
+                                  fromForm: true,
+                                  )));
                     }),
               )
             ],
