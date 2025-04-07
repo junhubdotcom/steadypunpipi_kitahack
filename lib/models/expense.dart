@@ -4,7 +4,7 @@ import 'package:steadypunpipi_vhack/models/expense_item.dart';
 class Expense {
   String? transactionName;
 
-  List<String> items;
+  List<DocumentReference<ExpenseItem>> items;
   String paymentMethod;
   Timestamp dateTime;
   String? location;
@@ -13,14 +13,14 @@ class Expense {
 
   Expense({
     String? transactionName,
-    List<String>? items,
+    List<DocumentReference<ExpenseItem>>? items,
     String? paymentMethod,
     Timestamp? dateTime,
     String? location,
     String? receiptImagePath,
     String? additionalImagePath,
   })  : transactionName = transactionName ?? "",
-        items = items ?? [""],
+        items = items ?? [],
         paymentMethod = paymentMethod ?? "Cash",
         dateTime = dateTime ?? Timestamp.now(),
         location = location ?? "None",
@@ -29,11 +29,44 @@ class Expense {
 
   // From JSON
   factory Expense.fromJson(Map<String, dynamic> json) {
+    final rawItemRefs = json['items'];
+    List<DocumentReference<ExpenseItem>>? typedItemRefs;
+
+    if (rawItemRefs is List) {
+      typedItemRefs = rawItemRefs
+          .map((rawRef) {
+            if (rawRef is DocumentReference) {
+              return (rawRef as DocumentReference).withConverter<ExpenseItem>(
+                fromFirestore: (snapshot, _) {
+                  if (!snapshot.exists || snapshot.data() == null) {
+                    print(
+                        "Warning: Referenced ExpenseItem document ${snapshot.id} does not exist or has no data.");
+                    throw Exception(
+                        "Referenced ExpenseItem document ${snapshot.id} not found or has null data.");
+                  }
+                  return ExpenseItem.fromJson(snapshot.data()!);
+                },
+                toFirestore: (item, _) => item.toJson(),
+              );
+            } else {
+              print(
+                  "Warning: Item in 'items' array is not a DocumentReference: $rawRef");
+              return null; // Or handle this error as needed
+            }
+          })
+          .whereType<DocumentReference<ExpenseItem>>()
+          .toList(); // Filter out nulls
+    } else if (rawItemRefs != null) {
+      print("Warning: 'items' field was not a List: $rawItemRefs");
+      typedItemRefs = null;
+    } else {
+      typedItemRefs = null;
+    }
+
     return Expense(
       transactionName: json['transactionName'] ?? "",
-
+      items: typedItemRefs,
       paymentMethod: json['paymentMethod'] ?? "Cash",
-      items: json['items'] ?? [""],
       // You can handle the following fields if Gemini returns them later or set defaults
       dateTime: json['dateTime'] is Timestamp
           ? json['dateTime'] as Timestamp

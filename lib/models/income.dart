@@ -26,7 +26,7 @@ class Income {
       'category': category,
       'amount': amount,
       'paymentMethod': paymentMethod,
-      'time': dateTime, // Convert DateTime to string
+      'dateTime': dateTime, // Convert DateTime to string
       'location': location,
       'proofOfIncome': proofOfIncome,
     };
@@ -39,8 +39,10 @@ class Income {
       category: json['category'] ?? 'Salary',
       amount: (json['amount'] ?? 0).toDouble(),
       paymentMethod: json['paymentMethod'] ?? 'Bank Transfer',
-      dateTime: json['dateTime'] is Timestamp ? json['dateTime'] as Timestamp : Timestamp.now(),
-      location: json['location'],
+      dateTime: json['dateTime'] is Timestamp
+          ? json['dateTime'] as Timestamp
+          : Timestamp.now(),
+      location: json['location'] ?? "None",
       proofOfIncome: json['proofOfIncome'],
     );
   }
