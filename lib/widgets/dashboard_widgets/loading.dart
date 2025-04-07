@@ -15,18 +15,24 @@ Widget loadingTips() {
     subtitle: "Smart moves for a better future",
     icon: Icons.tips_and_updates,
     tabs: const [
-      Tab(text: "Finance"),
-      Tab(text: "Environment"),
+      Tab(text: "temp"),
     ],
     tabViews: [
-      Padding(
-        padding: EdgeInsets.all(36),
-        child: loading(),
-      ),
-      Padding(
-        padding: EdgeInsets.all(36),
-        child: loading(),
-      )
+      Padding(padding: EdgeInsets.all(36), child: Center(child: loading()))
+    ],
+  );
+}
+
+Widget loadingSummary() {
+  return ExpandableCard(
+    title: "Summary",
+    subtitle: "A big picture",
+    icon: Icons.tips_and_updates,
+    tabs: const [
+      Tab(text: "Overall"),
+    ],
+    tabViews: [
+      Padding(padding: EdgeInsets.all(36), child: Center(child: loading()))
     ],
   );
 }
