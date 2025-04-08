@@ -40,29 +40,40 @@ class DatabaseService {
   Future<List<Expense>> getAllExpenses() async {
     try {
       QuerySnapshot<Expense> snapshot = await expensesCollection.get();
-      return snapshot.docs.map((doc) => doc.data()).toList();
+      return snapshot.docs.map((doc) {
+        Expense expense = doc.data();
+        expense.id = doc.id;
+        return expense;
+      }).toList();
     } catch (e) {
       print("Error getting all expenses: $e");
-      return []; 
+      return [];
     }
   }
 
   Future<List<Expense>> getExpensesByDay(DateTime targetDate) async {
-  try {
-    DateTime startOfDay = targetDate.copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
-    DateTime endOfDay = targetDate.copyWith(hour: 23, minute: 59, second: 59, millisecond: 999, microsecond: 999);
+    try {
+      DateTime startOfDay = targetDate.copyWith(
+          hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
+      DateTime endOfDay = targetDate.copyWith(
+          hour: 23, minute: 59, second: 59, millisecond: 999, microsecond: 999);
 
-    QuerySnapshot<Expense> snapshot = await expensesCollection
-        .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
-        .where('dateTime', isLessThanOrEqualTo: endOfDay)
-        .get();
+      QuerySnapshot<Expense> snapshot = await expensesCollection
+          .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
+          .where('dateTime', isLessThanOrEqualTo: endOfDay)
+          .get();
 
-    return snapshot.docs.map((doc) => doc.data()).toList();
-  } catch (e) {
-    print("Error getting expenses for ${targetDate.toLocal().toString().split(' ')[0]}: $e");
-    return [];
+      return snapshot.docs.map((doc) {
+        Expense expense = doc.data();
+        expense.id = doc.id;
+        return expense;
+      }).toList();
+    } catch (e) {
+      print(
+          "Error getting expenses for ${targetDate.toLocal().toString().split(' ')[0]}: $e");
+      return [];
+    }
   }
-}
 
   Future<DocumentReference<Expense>> addExpense(Expense expense) async {
     return await expensesCollection.add(expense);

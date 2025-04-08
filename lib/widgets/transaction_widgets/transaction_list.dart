@@ -188,8 +188,8 @@ class _buildTransactionDayState extends State<_buildTransactionDay> {
                         // })();
 
                         return TransactionContainer(
-                          transactionName: currentExpense.transactionName ?? 'No Name',
-                          paymentMethod: currentExpense.paymentMethod,
+                          transactionId: currentExpense.id ?? "",
+                          transaction: currentExpense,
                         );
                       },
                     ),

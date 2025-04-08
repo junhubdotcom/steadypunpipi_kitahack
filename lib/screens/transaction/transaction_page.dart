@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
+import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp, DocumentReference;
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -83,11 +83,7 @@ class _TransactionPageState extends State<TransactionPage> {
       uniqueDates = dateSet.toList()
         ..sort(
             (a, b) => b.compareTo(a)); // Sort unique dates in descending order
-
       // Debug print unique dates
-      for (var date in uniqueDates) {
-        print(date);
-      }
     } else {
       print("No expenses found.");
     }
