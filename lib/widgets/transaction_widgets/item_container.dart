@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:steadypunpipi_vhack/models/expense.dart';
-import 'package:steadypunpipi_vhack/models/expense_item.dart';
-import 'package:steadypunpipi_vhack/models/income.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/label.dart';
 
 class ItemContainer extends StatelessWidget {
