@@ -40,6 +40,9 @@ class _RecordTransactionState extends State<RecordTransaction> {
   late dynamic transaction;
   late List<ExpenseItem> expenseItems;
 
+  String expenseRefId = "";
+  String incomeRefId = "";
+
   // String? receipt;
   // String? thing_image;
   // String? proofOfIncome;
@@ -117,19 +120,19 @@ class _RecordTransactionState extends State<RecordTransaction> {
         minute: transaction.dateTime.minute,
       ));
 
-  Future<DocumentReference<Expense>> saveExpense(Expense expense) async {
+  Future<DocumentReference<Expense>> saveExpense(
+      Expense expense, List<ExpenseItem> items) async {
     try {
-      List<String> itemIds = [];
-      print("ExpenseItems: $expenseItems");
-      for (ExpenseItem item in expenseItems) {
+      List<DocumentReference<ExpenseItem>> itemRefs = [];
+      print("ExpenseItems: $items");
+      for (ExpenseItem item in items) {
         final ref = await db.addExpenseItem(item);
-        itemIds.add(ref.id);
-        print("ItemIds:$itemIds");
+        itemRefs.add(ref);
+        print("ref: $ref");
       }
-      print("Item Ids: $itemIds");
-      for (String itemId in itemIds) {
-        transaction.items.add(itemId);
-      }
+
+      expense.items = itemRefs;
+
       final expenseRef = await db.addExpense(expense);
       return expenseRef;
     } catch (e) {
@@ -481,7 +484,6 @@ class _RecordTransactionState extends State<RecordTransaction> {
                     buttonColor: 0xff74c95c,
                     button_text: "Done",
                     onPressed: () async {
-                      String expenseRefId = "";
                       if (isExpense) {
                         for (ExpenseItem item in expenseItems) {
                           if (item.name.isEmpty ||
@@ -499,18 +501,23 @@ class _RecordTransactionState extends State<RecordTransaction> {
                         }
                         await carbonService.generateCarbonApiJson(
                             transaction, expenseItems);
-                        final expenseRef = await saveExpense(transaction);
+                        final expenseRef =
+                            await saveExpense(transaction, expenseItems);
                         expenseRefId = expenseRef.id;
                       } else {
                         final incomeRef = await db.addIncome(transaction);
+                        incomeRefId = incomeRef.id;
                       }
 
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => TransactionDetails(
-                                  transaction: transaction,
-                                  isExpense: isExpense)));
+                                    transactionId:
+                                        isExpense ? expenseRefId : incomeRefId,
+                                    isExpense: isExpense,
+                                    fromForm: true,
+                                  )));
                     }),
               )
             ],

@@ -5,10 +5,9 @@ import 'package:steadypunpipi_vhack/models/income.dart';
 // import 'package:steadypunpipi_vhack/models/expensealt.dart';
 // import 'package:steadypunpipi_vhack/models/expense_itemalt.dart';
 
-const String EXPENSE_COLLECTION_REF = "Expense";
-const String INCOME_COLLECTION_REF = "Income";
-const String EXPENSE_ITEM_COLLECTION_REF = "ExpenseItem";
-
+const String EXPENSE_COLLECTION_REF = "test";
+const String INCOME_COLLECTION_REF = "testIncome";
+const String EXPENSE_ITEM_COLLECTION_REF = "testItem";
 
 class DatabaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -19,14 +18,13 @@ class DatabaseService {
                 snapshots.data()!,
               ),
           toFirestore: (expense, _) => (expense as Expense).toJson());
-  
 
   CollectionReference<Income> get incomesCollection =>
-    _firestore.collection(INCOME_COLLECTION_REF).withConverter<Income>(
-        fromFirestore: (snapshots, _) => Income.fromJson(
-              snapshots.data()!,
-            ),
-        toFirestore: (income, _) => (income as Income).toJson());
+      _firestore.collection(INCOME_COLLECTION_REF).withConverter<Income>(
+          fromFirestore: (snapshots, _) => Income.fromJson(
+                snapshots.data()!,
+              ),
+          toFirestore: (income, _) => (income as Income).toJson());
 
   CollectionReference<ExpenseItem> get expenseItemsCollection => _firestore
       .collection(EXPENSE_ITEM_COLLECTION_REF)
@@ -42,10 +40,38 @@ class DatabaseService {
   Future<List<Expense>> getAllExpenses() async {
     try {
       QuerySnapshot<Expense> snapshot = await expensesCollection.get();
-      return snapshot.docs.map((doc) => doc.data()).toList();
+      return snapshot.docs.map((doc) {
+        Expense expense = doc.data();
+        expense.id = doc.id;
+        return expense;
+      }).toList();
     } catch (e) {
       print("Error getting all expenses: $e");
-      return []; // Or handle the error as needed
+      return [];
+    }
+  }
+
+  Future<List<Expense>> getExpensesByDay(DateTime targetDate) async {
+    try {
+      DateTime startOfDay = targetDate.copyWith(
+          hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
+      DateTime endOfDay = targetDate.copyWith(
+          hour: 23, minute: 59, second: 59, millisecond: 999, microsecond: 999);
+
+      QuerySnapshot<Expense> snapshot = await expensesCollection
+          .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
+          .where('dateTime', isLessThanOrEqualTo: endOfDay)
+          .get();
+
+      return snapshot.docs.map((doc) {
+        Expense expense = doc.data();
+        expense.id = doc.id;
+        return expense;
+      }).toList();
+    } catch (e) {
+      print(
+          "Error getting expenses for ${targetDate.toLocal().toString().split(' ')[0]}: $e");
+      return [];
     }
   }
 
@@ -67,7 +93,7 @@ class DatabaseService {
   }
 
   //Income
- Future<DocumentReference<Income>> addIncome(Income income) async {
+  Future<DocumentReference<Income>> addIncome(Income income) async {
     return await incomesCollection.add(income);
   }
 

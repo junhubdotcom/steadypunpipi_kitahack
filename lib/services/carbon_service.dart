@@ -53,7 +53,6 @@ Example response:
       final response = await _model.generateContent([Content.text(prompt)]);
       try {
         final generatedText = response.text ?? "";
-        print(generatedText);
         final structuredJson = jsonDecode(generatedText);
         transactions.add(structuredJson);
       } catch (e) {
