@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:steadypunpipi_vhack/models/expense_item.dart';
 
 class Expense {
+  String? id; // Optional: to store the document ID if needed
   String? transactionName;
-
   List<DocumentReference<ExpenseItem>> items;
   String paymentMethod;
   Timestamp dateTime;
@@ -12,6 +12,7 @@ class Expense {
   String? additionalImagePath;
 
   Expense({
+    String? id,
     String? transactionName,
     List<DocumentReference<ExpenseItem>>? items,
     String? paymentMethod,

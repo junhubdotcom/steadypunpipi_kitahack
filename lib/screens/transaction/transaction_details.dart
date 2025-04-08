@@ -1,13 +1,9 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:steadypunpipi_vhack/models/expense.dart';
 import 'package:steadypunpipi_vhack/models/expense_item.dart';
-import 'package:steadypunpipi_vhack/models/income.dart';
-import 'package:steadypunpipi_vhack/screens/transaction/record_transaction.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/transaction_page.dart';
 import 'package:steadypunpipi_vhack/services/database_services.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/description.dart';
@@ -38,7 +34,6 @@ class _TransactionDetailsState extends State<TransactionDetails> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     initData();
   }
@@ -54,31 +49,13 @@ class _TransactionDetailsState extends State<TransactionDetails> {
     print("Fetching expenses...");
     if (widget.isExpense) {
       transaction = await db.getExpense(transactionId);
-      print(transaction);
-      if (transaction != null) {
-        print(
-            "Expense: ${transaction!.dateTime}, ${transaction!.items}, ${transaction!.transactionName}");
-      } else {
-        print("Expense not found.");
-      }
-
       /***If Print all items ***/
       if (transaction?.items != null && transaction!.items!.isNotEmpty) {
-        print(
-            "Number of referenced ExpenseItems: ${transaction.items!.length}");
         for (final itemRef in transaction.items!) {
           try {
             DocumentSnapshot<ExpenseItem> snapshot = await itemRef.get();
             ExpenseItem? item = snapshot.data();
             expenseItems.add(item!);
-            print(expenseItems);
-            if (item != null) {
-              print(
-                  "ExpenseItem: Name=${item.name}, Price=${item.price}, Quantity=${item.quantity}");
-            } else {
-              print(
-                  "Warning: Referenced ExpenseItem document (${itemRef.id}) does not exist or has no data.");
-            }
           } catch (e) {
             print("Error fetching ExpenseItem (${itemRef.id}): $e");
           }
@@ -243,9 +220,9 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                                   ? "Receipt"
                                   : "Proof Of Income"),
                           ImageDisplayWidget(
-                              imgPath: widget.isExpense
-                                  ? transaction.receiptImagePath ?? ""
-                                  : transaction.proofOfIncome ?? ""),
+                              imgPath: widget.isExpense ? "" : ""),
+                                  // ? transaction.receiptImagePath ?? ""
+                                  // : transaction.proofOfIncome ?? ""),
 
                           // Remove this column when it is income
                           widget.isExpense
@@ -255,8 +232,8 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                                     SmallTitle(title: "Image"),
                                     ImageDisplayWidget(
                                         imgPath:
-                                            transaction.additionalImagePath ??
-                                                ""),
+                                            // transaction.additionalImagePath ??
+                                            ""),
                                   ],
                                 )
                               : SizedBox(),
