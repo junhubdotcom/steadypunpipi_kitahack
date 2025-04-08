@@ -189,7 +189,6 @@ class _buildTransactionDayState extends State<_buildTransactionDay> {
 
                         return TransactionContainer(
                           transactionId: currentExpense.id ?? "",
-                          transaction: currentExpense,
                         );
                       },
                     ),

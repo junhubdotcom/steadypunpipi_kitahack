@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppConstants {
   // 🌟 App-wide values
   static const String appName = "Expense Tracker";
-  static const String currency = "USD";
+  static const String currency = "MYR";
 
   // 🌐 API Endpoints
   static const String baseUrl = "https://api.yourserver.com";

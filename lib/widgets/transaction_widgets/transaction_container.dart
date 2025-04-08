@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart' show DocumentSnapshot;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:steadypunpipi_vhack/models/expense.dart';
 import 'package:steadypunpipi_vhack/models/expense_item.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/transaction_details.dart';
 import 'package:steadypunpipi_vhack/services/database_services.dart';
@@ -9,12 +8,10 @@ import 'package:steadypunpipi_vhack/widgets/transaction_widgets/label.dart';
 
 class TransactionContainer extends StatefulWidget {
   final String transactionId;
-  final Expense transaction;
 
   const TransactionContainer({
     super.key,
     required this.transactionId,
-    required this.transaction,
   });
 
   @override
@@ -24,24 +21,33 @@ class TransactionContainer extends StatefulWidget {
 class _TransactionContainerState extends State<TransactionContainer> {
   DatabaseService db = DatabaseService();
   bool isLoading = true;
+  bool isMounted = false;
   late dynamic transaction;
   List<ExpenseItem> expenseItems = [];
 
   @override
   void initState() {
     super.initState();
+    isMounted = true;
     initData();
   }
 
   void initData() async {
-    await _fetchAndPrintExpenses(widget.transactionId);
-    setState(() {
-      isLoading = false;
-    });
+    await _fetchExpenses(widget.transactionId);
+    if(isMounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
-  Future<void> _fetchAndPrintExpenses(String transactionId) async {
-    print("Fetching expenses for transaction ID: $transactionId");
+  @override
+  void dispose() {
+    isMounted = false; 
+    super.dispose();
+  }
+
+  Future<void> _fetchExpenses(String transactionId) async {
     if (isLoading = true) {
       transaction = await db.getExpense(transactionId);
       if (transaction?.items != null && transaction!.items!.isNotEmpty) {
@@ -87,7 +93,6 @@ class _TransactionContainerState extends State<TransactionContainer> {
         ? Center(child: CircularProgressIndicator())
         : GestureDetector(
             onTap: () {
-              print('Transaction ID: ${widget.transactionId}');
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -113,17 +118,17 @@ class _TransactionContainerState extends State<TransactionContainer> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        (widget.transaction.transactionName == null ||
-                                widget.transaction.transactionName!.isEmpty)
+                        (transaction.transactionName == null ||
+                                transaction.transactionName!.isEmpty)
                             ? 'No transaction name'
-                            : widget.transaction.transactionName!,
+                            : transaction.transactionName!,
                         style: GoogleFonts.quicksand(
                             color: Colors.black,
                             fontSize: 16,
                             fontWeight: FontWeight.w900),
                       ),
                       Text(
-                        widget.transaction.paymentMethod,
+                        transaction.paymentMethod,
                         style: GoogleFonts.quicksand(
                             color: Colors.black,
                             fontSize: 12,
