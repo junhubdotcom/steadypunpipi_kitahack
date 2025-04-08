@@ -17,8 +17,6 @@ class ApiService {
       // final bytes = await image.readAsBytes();
       // final String mimeType = 'image/jpeg';
 
-      print("Continue 1");
-
       // Get google vision result
       final visionResult = await classifyImage(imgPath);
       print(visionResult);

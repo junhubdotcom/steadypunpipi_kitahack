@@ -120,11 +120,12 @@ class _RecordTransactionState extends State<RecordTransaction> {
         minute: transaction.dateTime.minute,
       ));
 
-  Future<DocumentReference<Expense>> saveExpense(Expense expense) async {
+  Future<DocumentReference<Expense>> saveExpense(
+      Expense expense, List<ExpenseItem> items) async {
     try {
       List<DocumentReference<ExpenseItem>> itemRefs = [];
-      print("ExpenseItems: $expenseItems");
-      for (ExpenseItem item in expenseItems) {
+      print("ExpenseItems: $items");
+      for (ExpenseItem item in items) {
         final ref = await db.addExpenseItem(item);
         itemRefs.add(ref);
         print("ref: $ref");
@@ -500,7 +501,8 @@ class _RecordTransactionState extends State<RecordTransaction> {
                         }
                         await carbonService.generateCarbonApiJson(
                             transaction, expenseItems);
-                        final expenseRef = await saveExpense(transaction);
+                        final expenseRef =
+                            await saveExpense(transaction, expenseItems);
                         expenseRefId = expenseRef.id;
                       } else {
                         final incomeRef = await db.addIncome(transaction);
@@ -511,10 +513,10 @@ class _RecordTransactionState extends State<RecordTransaction> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => TransactionDetails(
-                                  transactionId:
-                                      isExpense ? expenseRefId : incomeRefId,
-                                  isExpense: isExpense,
-                                  fromForm: true,
+                                    transactionId:
+                                        isExpense ? expenseRefId : incomeRefId,
+                                    isExpense: isExpense,
+                                    fromForm: true,
                                   )));
                     }),
               )
