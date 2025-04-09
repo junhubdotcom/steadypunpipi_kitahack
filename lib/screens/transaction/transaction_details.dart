@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:steadypunpipi_vhack/main.dart';
 import 'package:steadypunpipi_vhack/models/expense_item.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/transaction_page.dart';
 import 'package:steadypunpipi_vhack/services/database_services.dart';
@@ -221,8 +222,8 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                                   : "Proof Of Income"),
                           ImageDisplayWidget(
                               imgPath: widget.isExpense ? "" : ""),
-                                  // ? transaction.receiptImagePath ?? ""
-                                  // : transaction.proofOfIncome ?? ""),
+                          // ? transaction.receiptImagePath ?? ""
+                          // : transaction.proofOfIncome ?? ""),
 
                           // Remove this column when it is income
                           widget.isExpense
@@ -254,9 +255,10 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                           button_text: "Done",
                           onPressed: () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => TransactionPage()));
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const MainScreen()),
+                            );
                           })
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
