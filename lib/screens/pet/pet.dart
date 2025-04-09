@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/widgets/pet_widget/circularButton.dart';
-import 'package:steadypunpipi_vhack/services/database_services.dart';
 import 'chatpet.dart';
 import 'package:steadypunpipi_vhack/screens/pet/wardrobe.dart';
 import 'package:steadypunpipi_vhack/screens/pet/calendar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:steadypunpipi_vhack/models/expense_itemalt.dart';
 
 class PetPage extends StatefulWidget {
   @override
@@ -13,11 +10,8 @@ class PetPage extends StatefulWidget {
 }
 
 class _PetPageState extends State<PetPage> {
-  final DatabaseService _databaseService = DatabaseService();
-  // State to track which widget to display
-  int currentState = 1; // 1: WardrobePet, 2: ChatPet, 3: CalendarPet
+  int currentState = 1;
 
-  // State to track selected items
   String? _selectedHat;
   String? _selectedShirt;
 
@@ -33,53 +27,6 @@ class _PetPageState extends State<PetPage> {
       _selectedShirt = imageUrl;
       print("Selected Shirt: $_selectedShirt");
     });
-  }
-
-  void _fetchAndPrintExpenses() async {
-    print("Fetching expenses...");
-    final expense = await _databaseService.getExpense("4JggmstLee6VNIZ0zczn");
-    if (expense != null) {
-      print(
-          "Expense: ${expense.dateTime}, ${expense.items}, ${expense.transactionName}");
-    } else {
-      print("Expense not found.");
-    }
-    if (expense?.dateTime != null) {
-      // Already typed!
-      Timestamp timestamp = expense!.dateTime!;
-      DateTime dateTime = timestamp.toDate();
-      print("This is dateTime: ${dateTime}");
-    }
-
-    //***If Print all items ***/
-    // if (expense?.items != null && expense!.items!.isNotEmpty) {
-    //   print("Number of referenced ExpenseItems: ${expense.items!.length}");
-    //   for (final itemRef in expense.items!) {
-    //     try {
-    //       DocumentSnapshot<ExpenseItem> snapshot = await itemRef.get();
-    //       ExpenseItem? item = snapshot.data();
-    //       if (item != null) {
-    //         print(
-    //             "ExpenseItem: Name=${item.name}, Price=${item.price}, Quantity=${item.quantity}");
-    //       } else {
-    //         print(
-    //             "Warning: Referenced ExpenseItem document (${itemRef.id}) does not exist or has no data.");
-    //       }
-    //     } catch (e) {
-    //       print("Error fetching ExpenseItem (${itemRef.id}): $e");
-    //     }
-    //   }
-    // } else {
-    //   print("Expense has no referenced items or is null.");
-    // }
-
-    //***If Print one items ***/
-    // if (expense?.items != null) {
-    //   // Already typed!
-    //   DocumentSnapshot<ExpenseItem> snapshot = await expense!.items!.get();
-    //   ExpenseItem? item = snapshot.data(); // Already returns ExpenseItem?
-    //   print("This is expenseItem: ${item?.name},${item?.price},${item?.quantity}");
-    // }
   }
 
   @override
@@ -141,14 +88,8 @@ class _PetPageState extends State<PetPage> {
                       left: 10,
                       right: 10,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          CircularButton(
-                            icon: Icons.arrow_back,
-                            onPressed: () {
-                              _fetchAndPrintExpenses();
-                            },
-                          ),
                           Row(
                             children: [
                               CircularButton(
