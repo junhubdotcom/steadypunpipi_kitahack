@@ -1,5 +1,5 @@
 
-import { onDocumentCreated } from 'firebase-functions/v2/firestore';
+import { onDocumentCreated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
@@ -13,33 +13,18 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1
 
 // ==================== Utility Functions ====================
 
+const MALAYSIA_OFFSET = 8 * 60 * 60 * 1000;
+
 function getToday() {
-  const now = new Date();
-  now.setHours(now.getHours() + 8); // GMT+8
-  return now;
+  return new Date();
 }
 
-function getDayRange(date) {
-  const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const end = new Date(start);
-  end.setDate(start.getDate() + 1);
-  return { start, end };
+function shiftToMalaysia(date) {
+  return new Date(date.getTime() + MALAYSIA_OFFSET);
 }
 
-function getWeekRange(date) {
-  const day = date.getDay(); // Sunday = 0
-  const start = new Date(date);
-  start.setDate(start.getDate() - (day === 0 ? 6 : day - 1)); // Monday is the first day of the week!
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(start);
-  end.setDate(start.getDate() + 7);
-  return { start, end };
-}
-
-function getMonthRange(date) {
-  const start = new Date(date.getFullYear(), date.getMonth(), 1);
-  const end = new Date(date.getFullYear(), date.getMonth() + 1, 1);
-  return { start, end };
+function shiftToUTC(date) {
+  return new Date(date.getTime() - MALAYSIA_OFFSET);
 }
 
 function getWeekNumber(date) {
@@ -51,19 +36,76 @@ function getWeekNumber(date) {
 }
 
 function getDateId(prefix, date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
+  const malaysia = shiftToMalaysia(date);
+  const y = malaysia.getFullYear();
+  const m = String(malaysia.getMonth() + 1).padStart(2, '0');
+  const d = String(malaysia.getDate()).padStart(2, '0');
   return `${prefix}_${y}-${m}${prefix === 'monthly' ? '' : `-${d}`}`;
 }
+
+function getPreviousPeriodDate(period, currentDate) {
+  const date = shiftToMalaysia(currentDate);
+  if (period === 'daily') date.setDate(date.getDate() - 1);
+  else if (period === 'weekly') {
+    const day = date.getDay();
+    const offset = day === 0 ? 6 : day - 1;
+    date.setDate(date.getDate() - offset - 7);
+  } else if (period === 'monthly') {
+    date.setMonth(date.getMonth() - 1);
+    date.setDate(1);
+  }
+  return shiftToUTC(date);
+}
+
+
+function getDayRange(dateUTC) {
+  // const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  // const end = new Date(start);
+  // end.setDate(start.getDate() + 1);
+  // return { start, end };
+  const local = shiftToMalaysia(dateUTC);
+  const startLocal = new Date(local.getFullYear(), local.getMonth(), local.getDate());
+  const endLocal = new Date(startLocal);
+  endLocal.setDate(startLocal.getDate() + 1);
+  return { start: shiftToUTC(startLocal), end: shiftToUTC(endLocal) };
+}
+
+function getWeekRange(dateUTC) {
+  // const day = date.getDay(); // Sunday = 0
+  // const start = new Date(date);
+  // start.setDate(start.getDate() - (day === 0 ? 6 : day - 1)); // Monday is the first day of the week!
+  // start.setHours(0, 0, 0, 0);
+  // const end = new Date(start);
+  // end.setDate(start.getDate() + 6);
+  // return { start, end };
+  const local = shiftToMalaysia(dateUTC);
+  const day = local.getDay();
+  const startLocal = new Date(local);
+  startLocal.setDate(local.getDate() - (day === 0 ? 6 : day - 1));
+  startLocal.setHours(0, 0, 0, 0);
+  const endLocal = new Date(startLocal);
+  endLocal.setDate(startLocal.getDate() + 7);
+  return { start: shiftToUTC(startLocal), end: shiftToUTC(endLocal) };
+}
+
+function getMonthRange(dateUTC) {
+  // const start = new Date(date.getFullYear(), date.getMonth(), 1);
+  // const end = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+  // return { start, end };
+  const local = shiftToMalaysia(dateUTC);
+  const startLocal = new Date(local.getFullYear(), local.getMonth(), 1);
+  const endLocal = new Date(local.getFullYear(), local.getMonth() + 1, 1);
+  return { start: shiftToUTC(startLocal), end: shiftToUTC(endLocal) };
+}
+
 
 // Get and parse transactions from income/expense in Firestore 
 async function collectTransactions(start, end) {
   const transactions = [];
 
   const incomeSnap = await db.collection('Income')
-    .where('time', '>=', start)
-    .where('time', '<', end)
+    .where('dateTime', '>=', start)
+    .where('dateTime', '<', end)
     .get();
 
   incomeSnap.forEach(doc => {
@@ -109,21 +151,64 @@ async function collectTransactions(start, end) {
   return transactions;
 }
 
+// Fetch previous summary to be more smart and personalized
+async function fetchPreviousSummary(period, currentDate = new Date()) {
+  try {
+    const prevDate = getPreviousPeriodDate(period, currentDate);
+
+    const y = prevDate.getFullYear();
+    const m = String(prevDate.getMonth() + 1).padStart(2, '0');
+    const d = String(prevDate.getDate()).padStart(2, '0');
+
+    let docId;
+    if (period === 'daily') docId = `daily_${y}-${m}-${d}`;
+    else if (period === 'weekly') docId = `weekly_${y}-${m}-${d}`;
+    else docId = `monthly_${y}-${m}`;
+
+    const snapshot = await db.collection('InsightsSummary').doc(docId).get();
+
+    if (!snapshot.exists) {
+      console.log(`🕵️ No previous ${period} summary found (id: ${docId})`);
+      return null;
+    }
+
+    const data = snapshot.data();
+    if (!data || !Array.isArray(data.insights) || data.insights.length === 0) {
+      console.log(`⚠️ Previous ${period} summary exists but empty or invalid`);
+      return null;
+    }
+
+    return data.insights.join(' ');
+  } catch (e) {
+    console.error("🚨 Failed to fetch previous summary:", e);
+    return null;
+  }
+}
+
 // Call Gemini 
-async function getAIInsights(transactions, dateRange) {
-  const prompt = ` Analyze the transactions within the provided date range. Identify spending trends, and provide insights into the user's financial behaviors and habits and the carbon footprint produced. Additionally, based on the transaction data, provide at least two concise financial tips and two environmental tips aimed at reducing the user's carbon footprint. If applicable, you may provide more than two tips.
-        
-  The transaction currency is in RM. The unit for carbon footprint is kg.
+async function getAIInsights(transactions, dateRange, rawDate) {
+  const previousSummary = await fetchPreviousSummary(dateRange, rawDate);
 
-  Ensure the insights is a short narrative paragraph that user can quickly know what is happening in summary section of the dashboard
+  const prompt = `You are a smart assistant analyzing a user's spending and environmental footprint over time.
+  The transaction is in RM and carbon footprint is recorded in kg.
+  This week’s transaction period is: ${dateRange}
 
-  Ensure the financial tips are based on spending behavior, and the environmental tips should be informed by the carbon footprint data tied to each transaction.
+  ${previousSummary ? `Here is the previous period's summary for context:\n"${previousSummary}"\n` : ""}
 
-  Each tip should be concise (max 20 words) and easily actionable.
+  Now, analyze the new transactions. Identify:
+  - Recurring behaviors or new spending trends
+  - Notable increases/decreases in categories
+  - Environmental impact (CO2 per category)
+  - Summary that feels personalized and insightful
 
-  If no transactions are provided, return default suggestions or insights indicating the lack of data.
+  Then, provide:
+  - Insights in one paragraph
+  - 2-3 actionable financial tips (max 20 words each)
+  - 2-3 carbon-saving suggestions, based on transaction behavior
 
-  Return in this format:
+  If there's no data, write a friendly message explaining that and suggest habits they could try.
+
+  Return this JSON:
   {
     "insights": [""],
     "financeTips": ["", ""],
@@ -160,9 +245,23 @@ export const onExpenseCreated = onDocumentCreated('Expense/{id}', async (event) 
   await handleTransactionEvent(event);
 });
 
-async function handleTransactionEvent(event) {
-  const snapshot = event.data;
+export const onIncomeChanged = onDocumentWritten('Income/{id}', async (event) => {
+  await handleTransactionEvent(event);
+});
 
+export const onExpenseChanged = onDocumentWritten('Expense/{id}', async (event) => {
+  await handleTransactionEvent(event);
+});
+
+async function handleTransactionEvent(event) {
+
+  const snapshot = event.data?.after || event.data;
+
+  if (event.data?.before?.exists && event.data?.after?.exists) {
+    console.log("✏️ This is an update.");
+  } else if (!event.data?.before?.exists && event.data?.after?.exists) {
+    console.log("🆕 This is a create.");
+  }
   if (!snapshot?.data) {
     console.log("⚠️ No event data found.");
     return;
@@ -190,7 +289,7 @@ async function handleTransactionEvent(event) {
   if (updateDaily) {
     const { start, end } = getDayRange(txnDate);
     const transactions = await collectTransactions(start, end);
-    const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`);
+    const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`, start);
     const id = getDateId('daily', start);
     await writeInsights(id, insights);
   }
@@ -198,7 +297,7 @@ async function handleTransactionEvent(event) {
   if (updateWeekly) {
     const { start, end } = getWeekRange(txnDate);
     const transactions = await collectTransactions(start, end);
-    const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`);
+    const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`, start);
     const id = getDateId('weekly', start);
     await writeInsights(id, insights);
   }
@@ -206,18 +305,27 @@ async function handleTransactionEvent(event) {
   if (updateMonthly) {
     const { start, end } = getMonthRange(txnDate);
     const transactions = await collectTransactions(start, end);
-    const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`);
+    const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`, start);
     const id = getDateId('monthly', start);
     await writeInsights(id, insights);
   }
 }
 
 // Generate insights on schedule
+export const generateDailyInsights = onSchedule('0 16 * * *', async () => {
+  const today = getToday();
+  const { start, end } = getDayRange(today);
+  const transactions = await collectTransactions(start, end);
+  const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`, start);
+  const id = getDateId('daily', start);
+  await writeInsights(id, insights);
+});
+
 export const generateWeeklyInsights = onSchedule('0 16 * * *', async () => {
   const today = getToday();
   const { start, end } = getWeekRange(today);
   const transactions = await collectTransactions(start, end);
-  const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`);
+  const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`, start);
   const id = getDateId('weekly', start);
   await writeInsights(id, insights);
 });
@@ -226,52 +334,111 @@ export const generateMonthlyInsights = onSchedule('0 16 * * *', async () => {
   const today = getToday();
   const { start, end } = getMonthRange(today);
   const transactions = await collectTransactions(start, end);
-  const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`);
+  const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`, start);
   const id = getDateId('monthly', start);
   await writeInsights(id, insights);
 });
 
-// Update daily insights for every income recorded
-// export const generateDailyInsightsFromIncome = onDocumentCreated('incomes/{id}', async (event) => {
-//   const data = event.data?.data();
-//   if (!data?.dateTime) {
-//     console.log("⚠️ No dateTime found in income document.");
-//     return;
-//   }
+// ==================== Manual Insight Generation Triggers for Debugging ====================
+export const manualInsightTrigger = onDocumentWritten('Triggers/force-insight-generation', async (event) => {
+  const before = event.data?.before?.data() || {};
+  const after = event.data?.after?.data() || {};
 
-//   const date = data.dateTime.toDate(); // 👈 using dateTime field
-//   const { start, end } = getDayRange(date);
-//   const transactions = await collectTransactions(start, end);
-//   const insights = await getAIInsights(transactions, ${start.toISOString()} - ${end.toISOString()});
-//   const dailyId = getDailyId(start);
+  const generateAll = after.generateAll && !before.generateAll;
+  const generateToday = after.generateToday && !before.generateToday;
 
-//   await db.collection('insights_summary').doc(dailyId).set({
-//     ...insights,
-//     generatedAt: Timestamp.now(),
-//   });
+  if (generateAll) {
+    await generateAllDailyInsights();
+    await generateAllWeeklyInsights();
+    await generateAllMonthlyInsights();
+  }
 
-//   console.log(✅ Insight saved to insights_summary/${dailyId});
-// });
-// 
-// // Update daily insights for every expense recorded
-// export const generateDailyInsightsFromExpense = onDocumentCreated('expenses/{id}', async (event) => {
-//   const data = event.data?.data();
-//   if (!data?.dateTime) {
-//     console.log("⚠️ No dateTime found in expense document.");
-//     return;
-//   }
+  if (generateToday) {
+    const now = getToday();
 
-//   const date = data.dateTime.toDate();
-//   const { start, end } = getDayRange(date);
-//   const transactions = await collectTransactions(start, end);
-//   const insights = await getAIInsights(transactions, ${start.toISOString()} - ${end.toISOString()});
-//   const dailyId = getDailyId(start);
+    const { start: dayStart, end: dayEnd } = getDayRange(now);
+    const dailyTxns = await collectTransactions(dayStart, dayEnd);
+    await writeInsights(getDateId("daily", dayStart), await getAIInsights(dailyTxns, `${dayStart.toISOString()} - ${dayEnd.toISOString()}`));
 
-//   await db.collection('insights_summary').doc(dailyId).set({
-//     ...insights,
-//     generatedAt: Timestamp.now(),
-//   });
+    const { start: weekStart, end: weekEnd } = getWeekRange(now);
+    const weeklyTxns = await collectTransactions(weekStart, weekEnd);
+    await writeInsights(getDateId("weekly", weekStart), await getAIInsights(weeklyTxns, `${weekStart.toISOString()} - ${weekEnd.toISOString()}`));
 
-//   console.log(✅ Insight saved to insights_summary/${dailyId});
-// });
+    const { start: monthStart, end: monthEnd } = getMonthRange(now);
+    const monthlyTxns = await collectTransactions(monthStart, monthEnd);
+    await writeInsights(getDateId("monthly", monthStart), await getAIInsights(monthlyTxns, `${monthStart.toISOString()} - ${monthEnd.toISOString()}`));
+  }
 
+  // Reset flags after execution
+  await db.doc('Triggers/force-insight-generation').update({
+    generateToday: false,
+    generateAll: false
+  });
+});
+
+async function generateAllDailyInsights() {
+  const allDates = await getAllTransactionDates();
+  for (const date of allDates) {
+    const { start, end } = getDayRange(date);
+    const transactions = await collectTransactions(start, end);
+    const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`, start);
+    await writeInsights(getDateId("daily", start), insights);
+  }
+}
+
+async function generateAllWeeklyInsights() {
+  const allDates = await getAllTransactionDates();
+  const seen = new Set();
+
+  for (const date of allDates) {
+    const { start, end } = getWeekRange(date);
+    const key = start.toDateString();
+    if (seen.has(key)) continue;
+
+    const transactions = await collectTransactions(start, end);
+    const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`, start);
+    await writeInsights(getDateId("weekly", start), insights);
+    seen.add(key);
+  }
+}
+
+async function generateAllMonthlyInsights() {
+  const allDates = await getAllTransactionDates();
+  const seen = new Set();
+
+  for (const date of allDates) {
+    const { start, end } = getMonthRange(date);
+    const key = start.toDateString();
+    if (seen.has(key)) continue;
+
+    const transactions = await collectTransactions(start, end);
+    const insights = await getAIInsights(transactions, `${start.toISOString()} - ${end.toISOString()}`, start);
+    await writeInsights(getDateId("monthly", start), insights);
+    seen.add(key);
+  }
+}
+
+async function getAllTransactionDates() {
+  const dateSet = new Set();
+
+  const incomeSnap = await db.collection("Income").get();
+  incomeSnap.forEach((doc) => {
+    const d = doc.data();
+    if (d.dateTime?.toDate) {
+      dateSet.add(d.dateTime.toDate().toDateString());
+    }
+  });
+
+  const expenseSnap = await db.collection("Expense").get();
+  expenseSnap.forEach((doc) => {
+    const d = doc.data();
+    if (d.dateTime?.toDate) {
+      dateSet.add(d.dateTime.toDate().toDateString());
+    }
+  });
+
+  const uniqueDates = [...dateSet].map((str) => new Date(str));
+  uniqueDates.sort((a, b) => a - b);
+
+  return uniqueDates;
+}
