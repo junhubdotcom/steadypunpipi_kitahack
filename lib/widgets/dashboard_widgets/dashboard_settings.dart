@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class DashboardSettingsModal extends StatefulWidget {
   final List<String> initialSections;
@@ -11,7 +12,7 @@ class DashboardSettingsModal extends StatefulWidget {
   });
 
   @override
-  _DashboardSettingsModalState createState() => _DashboardSettingsModalState();
+  State<DashboardSettingsModal> createState() => _DashboardSettingsModalState();
 }
 
 class _DashboardSettingsModalState extends State<DashboardSettingsModal> {
@@ -21,84 +22,94 @@ class _DashboardSettingsModalState extends State<DashboardSettingsModal> {
   @override
   void initState() {
     super.initState();
-    sectionOrder =
-        List.from(widget.initialSections); // Copy to avoid modifying original
+    sectionOrder = List.from(widget.initialSections);
     sectionVisibility = {
-      "Summary": true,
-      "Breakdown": true,
-      "Trend": true,
-      "Tips": true,
+      for (var section in widget.initialSections) section: true,
     };
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.5), // Dimmed background
-      body: Center(
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.9,
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
+    return Dialog(
+      insetPadding: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+          maxWidth: 400,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
-              // Header
-              Text("Customize Dashboard",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-
-              // Toggle Visibility
-              Column(
-                children: sectionOrder.map((section) {
-                  return CheckboxListTile(
-                    title: Text(section),
-                    value: sectionVisibility[section] ?? true,
-                    onChanged: (bool? value) {
+              Text(
+                "Customize Dashboard",
+                style: GoogleFonts.quicksand(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ScrollConfiguration(
+                  behavior: const ScrollBehavior().copyWith(overscroll: false),
+                  child: ReorderableListView.builder(
+                    buildDefaultDragHandles: false,
+                    itemCount: sectionOrder.length,
+                    itemBuilder: (context, index) {
+                      final section = sectionOrder[index];
+                      return ListTile(
+                        key: ValueKey(section),
+                        title: Text(section, style: GoogleFonts.quicksand()),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Switch(
+                              value: sectionVisibility[section] ?? true,
+                              onChanged: (value) {
+                                setState(() {
+                                  sectionVisibility[section] = value;
+                                });
+                              },
+                            ),
+                            ReorderableDragStartListener(
+                              index: index,
+                              child: const Padding(
+                                padding: EdgeInsets.only(left: 12.0),
+                                child: Icon(Icons.drag_handle),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    onReorder: (oldIndex, newIndex) {
                       setState(() {
-                        sectionVisibility[section] = value ?? false;
+                        if (newIndex > oldIndex) newIndex--;
+                        final item = sectionOrder.removeAt(oldIndex);
+                        sectionOrder.insert(newIndex, item);
                       });
                     },
-                  );
-                }).toList(),
+                  ),
+                ),
               ),
-
-              Divider(),
-
-              // Drag and Drop Section Reordering
-              Text("Arrange Your Dashboard",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              SizedBox(height: 8),
-              ReorderableListView(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                onReorder: (oldIndex, newIndex) {
-                  setState(() {
-                    final item = sectionOrder.removeAt(oldIndex);
-                    sectionOrder.insert(
-                        newIndex > oldIndex ? newIndex - 1 : newIndex, item);
-                  });
-                },
-                children: sectionOrder.map((section) {
-                  return ListTile(
-                    key: ValueKey(section),
-                    title: Text(section),
-                    leading: Icon(Icons.drag_handle),
-                  );
-                }).toList(),
-              ),
-
-              SizedBox(height: 16),
-
-              // Save Button
-              ElevatedButton(
-                onPressed: () {
-                  widget.onSave(sectionOrder, sectionVisibility);
-                  Navigator.pop(context);
-                },
-                child: Text("Save Changes"),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text("Cancel", style: GoogleFonts.quicksand()),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      widget.onSave(sectionOrder, sectionVisibility);
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("Save", style: GoogleFonts.quicksand()),
+                  ),
+                ],
               ),
             ],
           ),

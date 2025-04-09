@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/common/constants.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:steadypunpipi_vhack/screens/onboarding_screen.dart';
 import 'route.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Tab Navigation',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: MainScreen(),
+      home: OnboardingScreen(),
     );
   }
 }
