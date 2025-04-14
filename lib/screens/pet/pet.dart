@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:steadypunpipi_vhack/widgets/dashboard_widgets/circularButton.dart';
+import 'package:steadypunpipi_vhack/widgets/pet_widget/circularButton.dart';
 import 'chatpet.dart';
 import 'package:steadypunpipi_vhack/screens/pet/wardrobe.dart';
 import 'package:steadypunpipi_vhack/screens/pet/calendar.dart';
@@ -10,10 +10,8 @@ class PetPage extends StatefulWidget {
 }
 
 class _PetPageState extends State<PetPage> {
-  // State to track which widget to display
-  int currentState = 1; // 1: WardrobePet, 2: ChatPet, 3: CalendarPet
+  int currentState = 1;
 
-  // State to track selected items
   String? _selectedHat;
   String? _selectedShirt;
 
@@ -66,7 +64,7 @@ class _PetPageState extends State<PetPage> {
                             ),
                           ),
                           // Enabled when selected
-                          if (_selectedHat == 'assets/images/hats/hat1.png')  
+                          if (_selectedHat == 'assets/images/hats/hat1.png')
                             Positioned.fill(
                               child: Image.asset(
                                 'assets/images/hats/hatwear1.png',
@@ -74,7 +72,8 @@ class _PetPageState extends State<PetPage> {
                               ),
                             ),
                           // Enabled when selected
-                          if (_selectedShirt == 'assets/images/shirts/shirt1.png')
+                          if (_selectedShirt ==
+                              'assets/images/shirts/shirt1.png')
                             Positioned.fill(
                               child: Image.asset(
                                 'assets/images/shirts/shirtwear1.png',
@@ -89,14 +88,8 @@ class _PetPageState extends State<PetPage> {
                       left: 10,
                       right: 10,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          CircularButton(
-                            icon: Icons.arrow_back,
-                            onPressed: () {
-                              // Handle back button press
-                            },
-                          ),
                           Row(
                             children: [
                               CircularButton(

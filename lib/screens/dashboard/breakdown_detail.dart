@@ -1,32 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:steadypunpipi_vhack/models/transaction_model.dart';
 
 class BreakdownDetailPage extends StatelessWidget {
   final String category;
   final String type; // Expense, Income, CO₂
+  final List<TransactionModel> transactions;
 
   const BreakdownDetailPage({
     Key? key,
     required this.category,
     required this.type,
+    required this.transactions,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Dummy transactions
-    final transactions = [
-      {"date": "2024-03-01", "amount": 50.00, "desc": "Item A"},
-      {"date": "2024-03-05", "amount": 100.00, "desc": "Item B"},
-      {"date": "2024-03-10", "amount": 30.00, "desc": "Item C"},
-    ];
-
-    // Determine color based on transaction type
-    Color amountColor = type == "Income"
-        ? Colors.green[700]!
-        : type == "Expense"
-            ? Colors.red[700]!
-            : Colors.blueGrey;
+    final filtered = transactions.where((tx) {
+      if (type == "CO₂") {
+        return tx.carbonFootprint != null && tx.category == category;
+      } else {
+        return tx.type.toLowerCase() == type.toLowerCase() &&
+            tx.category.toLowerCase() == category.toLowerCase();
+      }
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -38,56 +36,108 @@ class BreakdownDetailPage extends StatelessWidget {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: ListView.builder(
-          itemCount: transactions.length,
-          itemBuilder: (context, index) {
-            final txn = transactions[index];
-
-            // Format Date
-            String formattedDate = DateFormat("dd MMM yyyy")
-                .format(DateTime.parse(txn["date"].toString()));
-
-            // Format Amount
-            String amountPrefix = type == "Income" ? "+ RM" : "- RM";
-            String formattedAmount = "$amountPrefix${txn["amount"]}";
-
-            return Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 2,
-              margin: const EdgeInsets.symmetric(vertical: 6),
-              child: ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                title: Text(
-                  txn["desc"].toString(),
-                  style: GoogleFonts.quicksand(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                subtitle: Text(
-                  formattedDate,
-                  style: GoogleFonts.quicksand(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                trailing: Text(
-                  formattedAmount,
-                  style: GoogleFonts.quicksand(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: amountColor,
-                  ),
+      body: filtered.isEmpty
+          ? Center(
+              child: Text(
+                "No transactions found for this category.",
+                style: GoogleFonts.quicksand(
+                  fontSize: 16,
+                  color: Colors.grey,
                 ),
               ),
-            );
-          },
-        ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              itemCount: filtered.length,
+              itemBuilder: (context, index) {
+                final tx = filtered[index];
+                return TransactionItem(tx: tx);
+              },
+            ),
+    );
+  }
+}
+
+class TransactionItem extends StatelessWidget {
+  final TransactionModel tx;
+
+  const TransactionItem({super.key, required this.tx});
+
+  @override
+  Widget build(BuildContext context) {
+    final isExpense = tx.amount < 0;
+    final amountText = isExpense
+        ? "- RM ${tx.amount.abs().toStringAsFixed(2)}"
+        : "+ RM ${tx.amount.toStringAsFixed(2)}";
+    final carbonText =
+        tx.carbonFootprint != null ? "+${tx.carbonFootprint!.toStringAsFixed(1)} CO₂e" : "";
+
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xffe5ecdd),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left Side
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                tx.description,
+                style: GoogleFonts.quicksand(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              Text(
+                DateFormat('dd MMM yyyy').format(tx.date),
+                style: GoogleFonts.quicksand(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                tx.category,
+                style: GoogleFonts.quicksand(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+
+          // Right Side
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                amountText,
+                style: GoogleFonts.quicksand(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              if (carbonText.isNotEmpty)
+                Text(
+                  carbonText,
+                  style: GoogleFonts.quicksand(
+                    color: Colors.black,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

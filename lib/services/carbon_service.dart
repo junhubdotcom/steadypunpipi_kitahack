@@ -7,14 +7,21 @@ import 'package:http/http.dart' as http;
 import 'package:steadypunpipi_vhack/common/constants.dart';
 import 'package:steadypunpipi_vhack/models/expense.dart';
 import 'package:steadypunpipi_vhack/models/expense_item.dart';
+import 'package:steadypunpipi_vhack/services/database_services.dart';
 
 class CarbonService {
   final _model = GenerativeModel(
       model: "gemini-1.5-pro", apiKey: AppConstants.TRANSACTION_GEMINI_API_KEY);
+  // DatabaseService db = DatabaseService();
+  // List<ExpenseItem> expenseItems = [];
 
-  Future<void> generateCarbonApiJson(Expense expense) async {
+  Future<void> generateCarbonApiJson(Expense expense, List<ExpenseItem> expenseItems) async {
     List<Map<String, dynamic>> transactions = [];
-    for (ExpenseItem item in expense.items) {
+
+    //fetch the ExpenseItem objects from DB using IDs
+    // 
+    
+    for (ExpenseItem item in expenseItems) {
       final prompt = """
 Given this item: "${item.name}" under the category "${item.category}", classify it into a Merchant Category Code (MCC) and generate a JSON payload for the Connect Earth API.
 
@@ -28,7 +35,7 @@ The format should be:
     "categoryType": "mcc",
     "categoryValue": "MCC_CODE",
     "currencyISO": "MYR",
-    "transactionDate": "${expense.dateTime.toIso8601String().split('T')[0]}"
+    "transactionDate": "${expense.dateTime.toDate().toIso8601String().split('T')[0]}"
 }
 
 Example response:
@@ -46,7 +53,6 @@ Example response:
       final response = await _model.generateContent([Content.text(prompt)]);
       try {
         final generatedText = response.text ?? "";
-        print(generatedText);
         final structuredJson = jsonDecode(generatedText);
         transactions.add(structuredJson);
       } catch (e) {
@@ -54,25 +60,17 @@ Example response:
       }
     }
     print("Transactions Json List: $transactions");
-    return await sendToCarbonApi(transactions, expense);
+    return await sendToCarbonApi(transactions, expenseItems);
   }
 
   Future<void> sendToCarbonApi(
-      List<Map<String, dynamic>> transactions, Expense expense) async {
+      List<Map<String, dynamic>> transactions, List<ExpenseItem> expenseItems) async {
     const String url = 'https://api.connect.earth/transaction';
     const Map<String, String> headers = {
       'x-api-key': AppConstants.CARBON_API_KEY,
       'Content-Type': 'application/json',
     };
 
-    // final Map<String, dynamic> body = {
-    //   'price': 30.0,
-    //   'geo': 'MY',
-    //   'categoryType': 'mcc',
-    //   'categoryValue': '5499',
-    //   'currencyISO': 'MYR',
-    //   'transactionDate': '2025-04-02',
-    // };
     for (int i = 0; i < transactions.length; i++) {
       try {
         final response = await http.post(
@@ -88,7 +86,7 @@ Example response:
               (carbonData["kg_of_CO2e_emissions"] ?? 0.0).toDouble();
           print("Carbon Footprint: $carbonFootprint");
           if (i < transactions.length) {
-            expense.items[i].carbon_footprint = carbonFootprint;
+            expenseItems[i].carbon_footprint = carbonFootprint;
           }
         } else {
           print('Error: ${response.statusCode} - ${response.body}');

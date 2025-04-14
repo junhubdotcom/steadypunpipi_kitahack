@@ -1,11 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp, DocumentReference;
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:steadypunpipi_vhack/models/expense.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/filter.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/record_transaction.dart';
 import 'package:steadypunpipi_vhack/screens/transaction/scanner.dart';
+import 'package:steadypunpipi_vhack/services/database_services.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/indicator.dart';
 import 'package:steadypunpipi_vhack/widgets/transaction_widgets/transaction_list.dart';
 
@@ -17,6 +20,10 @@ class TransactionPage extends StatefulWidget {
 }
 
 class _TransactionPageState extends State<TransactionPage> {
+  bool isLoading = true;
+  DatabaseService _databaseService = DatabaseService();
+  late List<Expense> transactionList;
+  late List<DateTime> uniqueDates;
   // Color getCategoryColor(String category) {
   //   switch (category) {
   //     case 'Food':
@@ -39,6 +46,48 @@ class _TransactionPageState extends State<TransactionPage> {
   //       return Colors.grey;
   //   }
   // }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initData();
+  }
+
+  void initData() async {
+    await getAllExpenses();
+    // DateTime targetDate = DateTime.parse("2025-04-04 00:00:00.000");
+    // await getExpensesByDay(targetDate);
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<void> getAllExpenses() async {
+    transactionList = await _databaseService.getAllExpenses();
+    if (transactionList.isNotEmpty) {
+      final Set<DateTime> dateSet = {};
+      for (var transaction in transactionList) {
+        Timestamp timestamp = transaction.dateTime;
+        DateTime dateTime = timestamp.toDate();
+        dateSet.add(DateTime(dateTime.year, dateTime.month,
+            dateTime.day)); // Only keep the date part
+      }
+      uniqueDates = dateSet.toList()
+        ..sort(
+            (a, b) => b.compareTo(a)); // Sort unique dates in descending order
+      // Debug print unique dates
+    } else {
+      print("No expenses found.");
+    }
+  }
 
   String displayMonth = DateFormat('MMMM yyyy').format(DateTime.now());
   DateTime selectedMonth = DateTime.now();
@@ -151,100 +200,111 @@ class _TransactionPageState extends State<TransactionPage> {
               icon: Icon(Icons.filter_alt_outlined))
         ],
       ),
-      body: Center(
-          child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : transactionList.isEmpty
+              ? Center(child: Text('No transactions found.'))
+              : Center(
+                  child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 35, vertical: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Indicator(title: 'Income', value: 'RM 1000.00'),
-                      SizedBox(
-                        height: 5,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Indicator(title: 'Income', value: 'RM 1000.00'),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Indicator(
+                                    title: 'Expenses', value: 'RM 900.00'),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Indicator(
+                                    title: 'Carbon Footprint',
+                                    value: '500 CO2e'),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Image.asset(
+                              'assets/images/girl_tree.png',
+                              // fit: BoxFit.cover,
+                              width: MediaQuery.sizeOf(context).width * 0.50,
+                              height: MediaQuery.sizeOf(context).height * 0.20,
+                            ),
+                          )
+                        ],
                       ),
-                      Indicator(title: 'Expenses', value: 'RM 900.00'),
                       SizedBox(
-                        height: 5,
+                        height: 26,
                       ),
-                      Indicator(title: 'Carbon Footprint', value: '500 CO2e'),
+                      ElevatedButton(
+                        onPressed: () {
+                          selectMonth();
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0XFFE5ECDD),
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8.0)))),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.30,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                displayMonth,
+                                style: GoogleFonts.quicksand(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black),
+                              ),
+                              Expanded(
+                                child: Icon(
+                                  Icons.arrow_drop_down,
+                                  size: 20,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      SearchBar(
+                          leading: Icon(Icons.search),
+                          hintText: 'Search',
+                          constraints:
+                              BoxConstraints(minHeight: 45, maxHeight: 45),
+                          elevation: WidgetStatePropertyAll(0),
+                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)))),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Expanded(
+                        child: SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: Column(
+                              children: [
+                                TransactionList(
+                                  uniqueDates: uniqueDates,
+                                ),
+                              ],
+                            )),
+                      )
                     ],
                   ),
-                ),
-                Expanded(
-                  child: Image.asset(
-                    'assets/images/girl_tree.png',
-                    // fit: BoxFit.cover,
-                    width: MediaQuery.sizeOf(context).width * 0.50,
-                    height: MediaQuery.sizeOf(context).height * 0.20,
-                  ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 26,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                selectMonth();
-              },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0XFFE5ECDD),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8.0)))),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.30,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      displayMonth,
-                      style: GoogleFonts.quicksand(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black),
-                    ),
-                    Expanded(
-                      child: Icon(
-                        Icons.arrow_drop_down,
-                        size: 20,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            SearchBar(
-                leading: Icon(Icons.search),
-                hintText: 'Search',
-                constraints: BoxConstraints(minHeight: 45, maxHeight: 45),
-                elevation: WidgetStatePropertyAll(0),
-                shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)))),
-            SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      TransactionList(),
-                      TransactionList(),
-                    ],
-                  )),
-            )
-          ],
-        ),
-      )),
+                )),
     );
   }
 

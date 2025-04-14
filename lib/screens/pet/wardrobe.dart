@@ -33,7 +33,7 @@ class _WardrobePetState extends State<WardrobePet>
   final List<Map<String, dynamic>> backgroundItems2 = [
     {
       'imageUrl': "assets/images/backgrounds/background1.png",
-      'isUnlock': true,
+      'isUnlock': false,
     },
     {
       'imageUrl': "assets/images/backgrounds/background2.png",
@@ -127,7 +127,7 @@ class _WardrobePetState extends State<WardrobePet>
     },
     {
       'imageUrl': "assets/images/cats/cat4.png",
-      'isUnlock': true,
+      'isUnlock': false,
     },
     {
       'imageUrl': "assets/images/cats/cat5.png",

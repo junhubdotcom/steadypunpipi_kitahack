@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:steadypunpipi_vhack/common/constants.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:steadypunpipi_vhack/screens/onboarding_screen.dart';
 import 'route.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Tab Navigation',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: MainScreen(),
+      home: OnboardingScreen(),
     );
   }
 }
@@ -59,13 +60,15 @@ class _MainScreenState extends State<MainScreen> {
         height: 70.0,
         child: FloatingActionButton(
           onPressed: () {
-            _onTabTapped(2); // Navigate to the PetPage
+            _onTabTapped(2);
           },
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50.0),
           ),
+          backgroundColor: Colors.green.shade400,
           child: Icon(
             Icons.pets,
+            color: Color(0XFFE5ECDD),
             size: 30,
           ),
         ),
@@ -74,7 +77,7 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomAppBar(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         height: 60,
-        color: Colors.cyan.shade400,
+        color: Colors.grey[200],
         shape: const CircularNotchedRectangle(),
         notchMargin: 10,
         child: Row(
@@ -82,18 +85,18 @@ class _MainScreenState extends State<MainScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.attach_money,
-                color: Colors.black,
+                color: _currentIndex == 0 ? Colors.black : Colors.grey.shade600,
               ),
               onPressed: () {
                 _onTabTapped(0); // Navigate to the TransactionPage
               },
             ),
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.dashboard,
-                color: Colors.black,
+                color:_currentIndex == 1 ? Colors.black : Colors.grey.shade600,
               ),
               onPressed: () {
                 _onTabTapped(1); // Navigate to the DashboardPage
@@ -101,18 +104,18 @@ class _MainScreenState extends State<MainScreen> {
             ),
             SizedBox(width: 40), // Space for the FloatingActionButton
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.flag,
-                color: Colors.black,
+                color: _currentIndex == 3 ? Colors.black : Colors.grey.shade600,
               ),
               onPressed: () {
                 _onTabTapped(3); // Navigate to the MissionPage
               },
             ),
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.person,
-                color: Colors.black,
+                color: _currentIndex == 4 ? Colors.black : Colors.grey.shade600,
               ),
               onPressed: () {
                 _onTabTapped(4); // Navigate to the ProfilePage

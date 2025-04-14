@@ -48,7 +48,7 @@ class _ExpandableCardState extends State<ExpandableCard>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🟡 Header Section (Toggles Expansion)
+            // 🟡 Header Section
             GestureDetector(
               onTap: _toggleExpand,
               child: Row(
@@ -97,40 +97,46 @@ class _ExpandableCardState extends State<ExpandableCard>
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
               child: _isExpanded
-                  ? Column(
-                      children: [
-                        // 🔵 Tab Bar UI
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: TabBar(
-                            controller: _tabController,
-                            labelColor: Colors.black,
-                            unselectedLabelColor: Colors.grey,
-                            indicatorColor: Colors.blue,
-                            indicatorWeight: 3,
-                            tabs: widget.tabs,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
+                  ? widget.tabs.length > 1
+                      ? Column(
+                          children: [
+                            // 🔵 Tab Bar UI
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: TabBar(
+                                labelStyle: GoogleFonts.quicksand(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                                controller: _tabController,
+                                labelColor: Colors.black,
+                                unselectedLabelColor: Colors.grey,
+                                indicatorColor: Colors.blue,
+                                indicatorWeight: 3,
+                                tabs: widget.tabs,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
 
-                        // 🔴 TabBarView
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          constraints: BoxConstraints(
-                            maxHeight: _isExpanded ? 250 : 0,
-                          ),
-                          child: TabBarView(
-                            controller: _tabController,
-                            children: widget.tabViews,
-                          ),
-                        ),
-                      ],
-                    )
-                  : const SizedBox(),
+                            // 🔴 TabBarView
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                              constraints: BoxConstraints(
+                                maxHeight: _isExpanded ? 300 : 0,
+                              ),
+                              child: TabBarView(
+                                controller: _tabController,
+                                children: widget.tabViews,
+                              ),
+                            ),
+                          ],
+                        )
+                      : widget.tabViews[0]
+                  : const SizedBox.shrink(),
             ),
           ],
         ),
