@@ -27,9 +27,9 @@ class _DashboardPageState extends State<DashboardPage> {
   List<TransactionModel> transactions = [];
   List<FinanceCO2Data> trendData = [];
   Map<String, dynamic> geminiData = {
-    "insights": [],
-    "financeTips": [],
-    "environmentTips": [],
+    "insights": [""],
+    "financeTips": [""],
+    "environmentTips": [""],
   };
 
   bool isLoadingAI = false;
@@ -52,17 +52,18 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<void> _loadData(DateTime selectedDate) async {
     DateTime startDate;
-    DateTime endDate = selectedDate;
+    DateTime endDate;
 
     if (_selectedIndex == 0) {
       startDate = selectedDate;
+      endDate = startDate.add(Duration(days: 1));
     } else if (_selectedIndex == 1) {
       startDate =
           selectedDate.subtract(Duration(days: selectedDate.weekday - 1));
-      endDate = startDate.add(Duration(days: 6));
+      endDate = startDate.add(Duration(days: 7));
     } else {
       startDate = DateTime(selectedDate.year, selectedDate.month, 1);
-      endDate = DateTime(selectedDate.year, selectedDate.month + 1, 0);
+      endDate = DateTime(selectedDate.year, selectedDate.month + 1, 1);
     }
 
     var filteredTransactions =
@@ -198,26 +199,36 @@ class _DashboardPageState extends State<DashboardPage> {
                 _loadData(selectedDate);
               },
             ),
-            if (sectionVisibility["Summary"] ?? false)
-              isLoadingAI
-                  ? loadingSummary()
-                  : SummarySection(
-                      insights: List<String>.from(geminiData["insights"] ?? []),
-                      transactions: transactions,
-                    ),
-            if (sectionVisibility["Breakdown"] ?? false)
-              BreakdownSection(transactions: transactions),
-            if (sectionVisibility["Trend"] ?? false)
-              TrendSection(data: trendData, title: getSelectedPeriod()),
-            if (sectionVisibility["Tips"] ?? false)
-              isLoadingAI
-                  ? loadingTips()
-                  : TipsSection(
-                      financeTips:
-                          List<String>.from(geminiData["financeTips"] ?? []),
-                      environmentTips: List<String>.from(
-                          geminiData["environmentTips"] ?? []),
-                    ),
+            ...sectionOrder
+                .where((section) => sectionVisibility[section] ?? true)
+                .map((section) {
+              switch (section) {
+                case "Summary":
+                  return isLoadingAI
+                      ? loadingSummary()
+                      : SummarySection(
+                          insights:
+                              List<String>.from(geminiData["insights"] ?? []),
+                          transactions: transactions,
+                        );
+                case "Breakdown":
+                  return BreakdownSection(transactions: transactions);
+                case "Trend":
+                  return TrendSection(
+                      data: trendData, title: getSelectedPeriod());
+                case "Tips":
+                  return isLoadingAI
+                      ? loadingTips()
+                      : TipsSection(
+                          financeTips: List<String>.from(
+                              geminiData["financeTips"] ?? []),
+                          environmentTips: List<String>.from(
+                              geminiData["environmentTips"] ?? []),
+                        );
+                default:
+                  return SizedBox.shrink();
+              }
+            }).toList(),
           ],
         ),
       ),

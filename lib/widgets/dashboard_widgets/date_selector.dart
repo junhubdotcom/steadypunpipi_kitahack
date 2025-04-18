@@ -70,11 +70,11 @@ class _DateSelectorState extends State<DateSelector> {
   DateTime get endDate {
     switch (_selectedIndex) {
       case 0:
-        return _selectedDate;
+        return _selectedDate.add(Duration(days: 1));
       case 1:
-        return startDate.add(Duration(days: 6));
+        return startDate.add(Duration(days: 7));
       case 2:
-        return DateTime(_selectedDate.year, _selectedDate.month + 1, 0);
+        return DateTime(_selectedDate.year, _selectedDate.month + 1, 1);
       default:
         return _selectedDate;
     }

@@ -127,7 +127,7 @@ class BreakdownChart extends StatelessWidget {
     bool isCO2 = title.toLowerCase().contains("co₂");
 
     return SizedBox(
-      height: 250,
+      height: 280,
       child: SfCircularChart(
         title: ChartTitle(
           text: title,
@@ -144,7 +144,7 @@ class BreakdownChart extends StatelessWidget {
         series: <CircularSeries>[
           PieSeries<BreakdownItem, String>(
             dataSource: data,
-            xValueMapper: (BreakdownItem item, _) => item.category,
+            xValueMapper: (item, _) => item.category,
             yValueMapper: (BreakdownItem item, _) => item.value,
             dataLabelMapper: (BreakdownItem item, _) {
               final valueStr = isCO2
@@ -158,6 +158,7 @@ class BreakdownChart extends StatelessWidget {
               labelPosition: ChartDataLabelPosition.outside,
               connectorLineSettings: ConnectorLineSettings(width: 1),
               textStyle: TextStyle(fontSize: 11),
+              overflowMode: OverflowMode.shift,
             ),
           ),
         ],
