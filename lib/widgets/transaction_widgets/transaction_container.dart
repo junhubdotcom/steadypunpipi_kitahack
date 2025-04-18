@@ -34,7 +34,7 @@ class _TransactionContainerState extends State<TransactionContainer> {
 
   void initData() async {
     await _fetchExpenses(widget.transactionId);
-    if(isMounted) {
+    if (isMounted) {
       setState(() {
         isLoading = false;
       });
@@ -43,7 +43,7 @@ class _TransactionContainerState extends State<TransactionContainer> {
 
   @override
   void dispose() {
-    isMounted = false; 
+    isMounted = false;
     super.dispose();
   }
 
@@ -114,28 +114,33 @@ class _TransactionContainerState extends State<TransactionContainer> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        (transaction.transactionName == null ||
-                                transaction.transactionName!.isEmpty)
-                            ? 'No transaction name'
-                            : transaction.transactionName!,
-                        style: GoogleFonts.quicksand(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900),
-                      ),
-                      Text(
-                        transaction.paymentMethod,
-                        style: GoogleFonts.quicksand(
-                            color: Colors.black,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600),
-                      ),
-                      Label(),
-                    ],
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          (transaction.transactionName == null ||
+                                  transaction.transactionName!.isEmpty)
+                              ? 'No transaction name'
+                              : transaction.transactionName!,
+                          style: GoogleFonts.quicksand(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900),
+                        ),
+                        Text(
+                          transaction.paymentMethod,
+                          style: GoogleFonts.quicksand(
+                              color: Colors.black,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        Label(),
+                      ],
+                    ),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,

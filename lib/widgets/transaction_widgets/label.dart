@@ -12,6 +12,7 @@ class Label extends StatelessWidget {
       decoration: BoxDecoration(
           color: Color(0xffffc670), borderRadius: BorderRadius.circular(3)),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             Icons.local_pizza_sharp,
